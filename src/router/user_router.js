@@ -11,7 +11,17 @@ router.post('/user/signup', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
     } catch (e) {
-        res.status(400).send(e)
+        let error = {};
+        if (e.keyPattern?.uniqueName) {
+            error.message = 'Duplicated unique name';
+        }
+        else if (e.keyPattern?.email) {
+            error.message = 'Duplicated email';
+        }
+        else {
+            error.message = 'Sign up failed';
+        }
+        res.status(400).send(error);
     }
 })
 
@@ -19,17 +29,15 @@ router.post('/user/login', async (req, res) => {
     try {
         const user = await User.findByCredentials(req.body.email, req.body.password)
         const token = await user.generateAuthToken()
-        res.send({ user, token })
+        res.status(200).send({ user, token })
     } catch (e) {
-        res.status(400).send()
+        res.status(400).send(e)
     }
 })
 
 router.post('/users/logout', auth, async (req, res) => {
     try {
-        req.user.tokens = req.user.tokens.filter((token) => {
-            return token.token !== req.token
-        })
+        req.user.token = undefined
         await req.user.save()
 
         res.send()
