@@ -35,7 +35,7 @@ router.post('/user/login', async (req, res) => {
     }
 })
 
-router.post('/users/logout', auth, async (req, res) => {
+router.post('/user/logout', auth, async (req, res) => {
     try {
         req.user.token = undefined
         await req.user.save()
@@ -46,11 +46,11 @@ router.post('/users/logout', auth, async (req, res) => {
     }
 })
 
-router.get('/users/me', auth, async (req, res) => {
-    res.send(req.user)
+router.get('/user/me', auth, async (req, res) => {
+    res.status(200).send(req.user);
 })
 
-router.patch('/users/me', auth, async (req, res) => {
+router.patch('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'password', 'age']
     const isValidOperation = updates.every((update) => allowedUpdates.includes(update))
