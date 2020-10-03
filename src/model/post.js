@@ -3,13 +3,7 @@ const mongoose = require('mongoose');
 const postSchema = new mongoose.Schema({
     content: {
         type: String,
-        required: true,
         trim: true,
-        validate(value) {
-            if (value.trim() === '') {
-                throw new Error('Post content cannot be empty');
-            }
-        }
     },
     imageUrls: {
         type: [String],

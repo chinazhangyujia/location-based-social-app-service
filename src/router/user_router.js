@@ -46,6 +46,18 @@ router.post('/user/logout', auth, async (req, res) => {
     }
 })
 
+router.get('/userById/:id', async (req, res) => {
+    const userId = req.params.id;
+
+    try {
+        const user = await User.findById(userId).exec()
+        res.status(200).send(user);
+    }
+    catch (e) {
+        res.status(400).send('Failed to find user info');
+    }
+})
+
 router.get('/user/me', auth, async (req, res) => {
     res.status(200).send(req.user);
 })
