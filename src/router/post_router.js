@@ -13,6 +13,16 @@ router.get('/post', auth, async (req, res) => {
     }
 })
 
+router.get('/allPosts', async (req, res) => {
+    try {
+        const posts = await Post.find().sort({_id: -1}).populate('owner').exec();
+        res.status(200).send(posts);
+    }
+    catch (e) {
+        res.status(500).send('Failed to get posts');
+    }
+})
+
 router.post('/post', auth, async (req, res) => {
     const post = new Post({
         ...req.body,
