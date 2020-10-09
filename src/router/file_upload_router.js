@@ -24,10 +24,11 @@ router.post("/generatePresignedUrl", auth, (req, res) => {
 
     fileType = fileType.substring(1, fileType.length);
 
+    const folder = "post_image";
     const fileName = uuid.v4();
     const s3Params = {
         Bucket: S3_BUCKET,
-        Key: fileName + "." + fileType,
+        Key: folder + "/" + fileName + "." + fileType,
         Expires: 60 * 60,
         ContentType: "image/" + fileType,
         ACL: "public-read",
@@ -43,7 +44,7 @@ router.post("/generatePresignedUrl", auth, (req, res) => {
             message: "Url generated",
             uploadUrl: data,
             downloadUrl:
-                `https://${S3_BUCKET}.s3.amazonaws.com/${fileName}` + "." + fileType,
+                `https://${S3_BUCKET}.s3.amazonaws.com/${folder}/${fileName}` + "." + fileType,
         };
         return res.status(201).json(returnData);
     });
