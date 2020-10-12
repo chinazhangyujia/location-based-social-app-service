@@ -62,6 +62,17 @@ router.get('/user/me', auth, async (req, res) => {
     res.status(200).send(req.user);
 })
 
+router.post('/user/intro', auth, async (req, res) => {
+    try {
+        const introduction = req.body.intro;
+        const updatedInfo = await User.updateOne({_id: req.user._id}, {introduction: introduction});
+        res.status(200).send(updatedInfo);
+    } catch (e) {
+        console.log(e);
+        res.status(500).send('Failed to update self introduction');
+    }
+})
+
 router.patch('/user/me', auth, async (req, res) => {
     const updates = Object.keys(req.body)
     const allowedUpdates = ['name', 'email', 'password', 'age']
