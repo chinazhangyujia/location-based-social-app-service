@@ -47,14 +47,24 @@ router.post('/user/logout', auth, async (req, res) => {
 })
 
 router.get('/userById/:id', async (req, res) => {
-    const userId = req.params.id;
-
     try {
+        const userId = req.params.id;
         const user = await User.findById(userId).exec()
         res.status(200).send(user);
     }
     catch (e) {
         res.status(400).send('Failed to find user info');
+    }
+})
+
+router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
+    try {
+        const uniqueName = req.params.uniqueName;
+        const user = await User.findOne({uniqueName: uniqueName}).exec();
+        res.status(200).send(user);
+    }
+    catch (e) {
+        res.status(500).send('Failed to get users for unique name');
     }
 })
 
