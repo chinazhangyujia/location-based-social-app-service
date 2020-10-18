@@ -2,6 +2,8 @@ const express = require('express')
 const { User } = require('../model/user')
 const auth = require('../middleware/auth')
 const router = express.Router()
+const Friend = require('../model/friend')
+const AddFriendRequest = require('../model/add_friend_request')
 
 router.post('/user/signup', async (req, res) => {
     const user = new User(req.body)
@@ -61,7 +63,34 @@ router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
     try {
         const uniqueName = req.params.uniqueName;
         const user = await User.findOne({uniqueName: uniqueName}).exec();
-        res.status(200).send(user);
+
+        let userObject = null;
+
+        if (user) {
+            const friendship = await Friend.findOne({userId: req.user._id, friendUserId: user._id, status: 'active'});
+            const pendingRequest = await AddFriendRequest.findOne({toUser: user._id, fromUser: req.user._id, status: 'pending'});
+
+            userObject = user.toObject()
+
+            delete userObject.password
+            delete userObject.token
+
+            if (!friendship && !pendingRequest) {
+                userObject.friendStatus = 'NOT_FRIEND';
+            }
+            else if (!friendship && !!pendingRequest) {
+                userObject.friendStatus = 'PENDING';
+            }
+            else if (!!friendship && !pendingRequest) {
+                userObject.friendStatus = 'IS_FRIEND';
+            }
+            else {
+                userObject.friendStatus = 'UNKNOWN';
+            }
+
+        }
+
+        res.status(200).send(userObject);
     }
     catch (e) {
         res.status(500).send('Failed to get users for unique name');
@@ -78,7 +107,6 @@ router.post('/user/intro', auth, async (req, res) => {
         const updatedInfo = await User.updateOne({_id: req.user._id}, {introduction: introduction});
         res.status(200).send(updatedInfo);
     } catch (e) {
-        console.log(e);
         res.status(500).send('Failed to update self introduction');
     }
 })
