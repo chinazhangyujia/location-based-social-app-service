@@ -29,18 +29,42 @@ router.post('/addFriendRequest', auth, async (req, res) => {
             notified: false
         })
 
-        console.log(friendRequest)
 
         await friendRequest.save();
         res.status(200).send();
     }
     catch (e) {
-        console.log(e)
         res.status(500).send('Failed to post comment');
     }
 })
 
-// todo get friends request
+router.post('/markRequestAsNotified', auth, async (req, res) => {
+    try {
+        const requestIds = req.body.requestIds;
+
+        await AddFriendRequest.updateMany({_id: {$in: requestIds}}, {notified: true}).exec();
+        res.status(200).send();
+    }
+    catch (e) {
+        res.status(500).send('Failed to post comment');
+    }
+})
+
+router.get('/unnotifiedRequests', auth, async (req, res) => {
+    try {
+        const unnotifiedRequests = await AddFriendRequest.find({toUser: req.user._id, status: 'pending', notified: false})
+            .sort({_id: -1})
+            .populate('fromUser')
+            .exec();
+
+        res.status(200).send(unnotifiedRequests);
+    }
+    catch (e) {
+        res.status(400).send();
+    }
+})
+
+
 
 router.post('/handleFriendRequest', auth, async (req, res) => {
 
