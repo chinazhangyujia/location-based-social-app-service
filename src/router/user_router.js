@@ -67,15 +67,18 @@ router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
         let userObject = null;
 
         if (user) {
-            const friendship = await Friend.findOne({userId: req.user._id, friendUserId: user._id, status: 'active'});
+            const friendship = await Friend.findOne({user: req.user._id, friendUser: user._id, status: 'active'});
             const pendingRequest = await AddFriendRequest.findOne({toUser: user._id, fromUser: req.user._id, status: 'pending'});
 
             userObject = user.toObject()
 
             delete userObject.password
             delete userObject.token
-
-            if (!friendship && !pendingRequest) {
+            
+            if (user._id.toString() === req.user._id.toString()) {
+                userObject.friendStatus = 'N/A';
+            }
+            else if (!friendship && !pendingRequest) {
                 userObject.friendStatus = 'NOT_FRIEND';
             }
             else if (!friendship && !!pendingRequest) {

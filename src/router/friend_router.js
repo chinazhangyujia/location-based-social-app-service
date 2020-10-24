@@ -7,9 +7,9 @@ const AddFriendRequest = require('../model/add_friend_request')
 
 router.get('/friends', auth, async (req, res) => {
     try {
-        const friends = await Friend.find({userId: req.user._id, status: 'active'})
-            .select({friendUserId: 1})
-            .populate('friendUserId')
+        const friends = await Friend.find({user: req.user._id, status: 'active'})
+            .select({friendUser: 1})
+            .populate('friendUser')
             .sort({name: 1})
             .exec();
 
@@ -50,14 +50,14 @@ router.post('/markRequestAsNotified', auth, async (req, res) => {
     }
 })
 
-router.get('/unnotifiedRequests', auth, async (req, res) => {
+router.get('/pendingRequests', auth, async (req, res) => {
     try {
-        const unnotifiedRequests = await AddFriendRequest.find({toUser: req.user._id, status: 'pending', notified: false})
+        const pendingRequests = await AddFriendRequest.find({toUser: req.user._id, status: 'pending'})
             .sort({_id: -1})
             .populate('fromUser')
             .exec();
 
-        res.status(200).send(unnotifiedRequests);
+        res.status(200).send(pendingRequests);
     }
     catch (e) {
         res.status(400).send();
@@ -70,19 +70,19 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
 
     try {
         const requestId = req.body.requestId;
-        const session = mongoose.startSession();
+        const session = await mongoose.startSession();
         session.startTransaction();
 
         const friendRequest = await AddFriendRequest.findByIdAndUpdate({_id: requestId}, {status: req.body.status,}, {session: session, new: true}).exec()
-        if (friendRequest.toUser !== req.user._id) {
+        if (friendRequest.toUser.toString() !== req.user._id.toString()) {
             await session.abortTransaction();
             session.endSession();
             res.status(400).send('Add friend request does not belong to this user');
             return
         }
 
-        const existingFriendship1 = await Friend.findOne({userId: req.user._id, friendUserId: friendRequest.fromUser }).exec();
-        const existingFriendship2 = await Friend.findOne({userId: friendRequest.fromUser, friendUserId: req.user._id }).exec();
+        const existingFriendship1 = await Friend.findOne({user: req.user._id, friendUser: friendRequest.fromUser }).exec();
+        const existingFriendship2 = await Friend.findOne({user: friendRequest.fromUser, friendUser: req.user._id }).exec();
 
         if (!isValidFriendship(existingFriendship1, existingFriendship2)) {
             await session.abortTransaction();
@@ -91,25 +91,21 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
             return
         }
 
+        if (!existingFriendship1 && !existingFriendship2 && friendRequest.status === 'accepted') {
+            const friendShip1 = new Friend({
+                user: req.user._id,
+                friendUser: friendRequest.fromUser,
+                status: 'active'
+            });
+            const friendShip2 = new Friend({
+                user: friendRequest.fromUser,
+                friendUser: req.user._id,
+                status: 'active'
+            });
 
-
-        Friend.replaceOne({
-            userId: req.user._id,
-            friendUserId: friendRequest.fromUser,
-        }, {
-            userId: req.user._id,
-            friendUserId: friendRequest.fromUser,
-            status: friendRequest.status === 'accepted' ? 'active' : 'cancelled'
-        }, {upsert: true});
-
-        Friend.replaceOne({
-            userId: friendRequest.fromUser,
-            friendUserId: req.user._id,
-        }, {
-            userId: friendRequest.fromUser,
-            friendUserId: req.user._id,
-            status: friendRequest.status === 'accepted' ? 'active' : 'cancelled'
-        }, {upsert: true});
+            friendShip1.save();
+            friendShip2.save();
+        }
 
         await session.commitTransaction();
         session.endSession();

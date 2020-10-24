@@ -5,3 +5,5 @@ mongoose.connect('mongodb://127.0.0.1:27017/location-based-social-app', {
     useCreateIndex: true,
     autoIndex: true
 })
+
+mongoose.set('useFindAndModify', false);

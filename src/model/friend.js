@@ -1,13 +1,13 @@
 const mongoose = require('mongoose')
 
 const friendSchema = new mongoose.Schema({
-    userId: {
+    user: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User',
         index: true
     },
-    friendUserId: {
+    friendUser: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
         ref: 'User'
@@ -21,7 +21,7 @@ const friendSchema = new mongoose.Schema({
     timestamps: true
 })
 
-friendSchema.index({ userId: 1, friendUserId: 1}, { unique: true });
+friendSchema.index({ user: 1, friendUser: 1}, { unique: true });
 
 const Friend = mongoose.model('Friend', friendSchema)
 
