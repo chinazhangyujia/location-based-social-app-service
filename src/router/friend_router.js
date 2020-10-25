@@ -5,6 +5,9 @@ const auth = require('../middleware/auth')
 const Friend = require('../model/friend')
 const AddFriendRequest = require('../model/add_friend_request')
 
+/**
+ * Friend
+ */
 router.get('/friends', auth, async (req, res) => {
     try {
         const friends = await Friend.find({user: req.user._id, status: 'active'})
@@ -20,6 +23,21 @@ router.get('/friends', auth, async (req, res) => {
     }
 })
 
+router.post('/cancelFriendship', auth, async (req, res) => {
+    try {
+        const friendUserId = req.body.friendUser;
+        await Friend.findOneAndUpdate({user: req.user._id, friendUser: friendUserId}, {status: 'cancelled'});
+        await Friend.findOneAndUpdate({user: friendUserId, friendUser: req.user._id}, {status: 'cancelled'});
+        res.status(200).send({friendUser: friendUserId});
+    } catch (e) {
+        res.status(400).send('Failed to delete friend');
+    }
+})
+
+
+/**
+ * Friend request
+ */
 router.post('/addFriendRequest', auth, async (req, res) => {
     try {
         const friendRequest = new AddFriendRequest({
@@ -64,8 +82,6 @@ router.get('/pendingRequests', auth, async (req, res) => {
     }
 })
 
-
-
 router.post('/handleFriendRequest', auth, async (req, res) => {
 
     try {
@@ -81,30 +97,9 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
             return
         }
 
-        const existingFriendship1 = await Friend.findOne({user: req.user._id, friendUser: friendRequest.fromUser }).exec();
-        const existingFriendship2 = await Friend.findOne({user: friendRequest.fromUser, friendUser: req.user._id }).exec();
-
-        if (!isValidFriendship(existingFriendship1, existingFriendship2)) {
-            await session.abortTransaction();
-            session.endSession();
-            res.status(400).send('Invalid existing friendship'); // todo fix data?
-            return
-        }
-
-        if (!existingFriendship1 && !existingFriendship2 && friendRequest.status === 'accepted') {
-            const friendShip1 = new Friend({
-                user: req.user._id,
-                friendUser: friendRequest.fromUser,
-                status: 'active'
-            });
-            const friendShip2 = new Friend({
-                user: friendRequest.fromUser,
-                friendUser: req.user._id,
-                status: 'active'
-            });
-
-            friendShip1.save();
-            friendShip2.save();
+        if (friendRequest.status === 'accepted') {
+            await Friend.findOneAndUpdate({user: req.user._id, friendUser: friendRequest.fromUser }, {status: 'active'}, { upsert: true }).exec();
+            await Friend.findOneAndUpdate({user: friendRequest.fromUser, friendUser: req.user._id }, {status: 'active'}, { upsert: true }).exec();
         }
 
         await session.commitTransaction();
@@ -116,17 +111,5 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
         res.status(500).send('Failed to post comment');
     }
 })
-
-const isValidFriendship = (friendship1, friendship2) => {
-    if (!friendship1 && !!friendship2 || !!friendship1 && !friendship2) {
-        return false;
-    }
-
-    if (!friendship1 && ! friendship2) {
-        return true;
-    }
-
-    return friendship1.status === friendship2.status;
-}
 
 module.exports = router
