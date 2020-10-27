@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Post = require('../model/post');
-const auth = require('../middleware/auth')
+const Friend = require('../model/friend');
+const auth = require('../middleware/auth');
 
 const METERS_PER_MILE = 1609.34;
 
@@ -34,6 +35,22 @@ router.get('/allPosts', async (req, res) => {
     }
     catch (e) {
         res.status(500).send('Failed to get posts');
+    }
+})
+
+router.get('/friendPosts', auth, async (req, res) => {
+    try {
+        const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
+        friends.push(req.user._id);
+
+        const posts = await Post.find({
+            owner: {$in: friends}
+        }).sort({_id: -1}).populate('owner').exec();
+
+        res.status(200).send(posts);
+    }
+    catch (e) {
+        res.status(500).send("Failed to get friends' posts");
     }
 })
 
