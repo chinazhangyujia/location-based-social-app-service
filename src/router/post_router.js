@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const Post = require('../model/post');
 const Friend = require('../model/friend');
+const Comment = require('../model/comment');
+const CommentNotification = require('../model/comment_notification');
 const auth = require('../middleware/auth');
 
 const METERS_PER_MILE = 1609.34;
@@ -43,14 +45,57 @@ router.get('/friendPosts', auth, async (req, res) => {
         const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
         friends.push(req.user._id);
 
-        const posts = await Post.find({
+        const friendPosts = await Post.find({
             owner: {$in: friends}
         }).sort({_id: -1}).populate('owner').exec();
+
+        const commentedPosts = await Comment.find({sendFrom: req.user._id}, 'post').distinct('post').populate('post').exec();
+
+        const compare = (a, b) => {
+            if ((a._id.toString()) < (b._id.toString())) {
+                return 1;
+            }
+            else if ((a._id.toString()) > (b._id.toString())) {
+                return -1;
+            }
+            else {
+                return 0;
+            }
+        }
+
+        let posts = [...friendPosts, ...commentedPosts];
+        posts = posts.sort(compare).filter((item, index, array) => {
+            if (index === 0) {
+                return true;
+            }
+
+            return (item._id.toString()) !== array[index - 1]._id.toString()
+        })
 
         res.status(200).send(posts);
     }
     catch (e) {
         res.status(500).send("Failed to get friends' posts");
+    }
+})
+
+router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
+    try {
+        const postIds = await CommentNotification
+            .find({toUser: req.user._id, notified: false}, 'post')
+            .distinct('post')
+            .exec();
+
+        const posts = await Post
+            .find({_id: {$in: postIds}})
+            .populate('owner')
+            .sort({_id: -1})
+            .exec();
+
+        res.status(200).send(posts);
+
+    } catch (e) {
+        res.status(400).send('Failed to get posts with unnotified comment');
     }
 })
 
