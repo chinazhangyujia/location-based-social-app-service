@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const pointSchema = require('./point');
+const PostLikes = require('./post_likes');
 
 const postSchema = new mongoose.Schema({
     content: {
@@ -23,6 +24,22 @@ const postSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
+
+postSchema.methods.addLikesData =  async function (userId) {
+    const post = this
+    const postObject = post.toObject()
+
+    const postId = postObject._id;
+    const postLikes = await PostLikes.find({post: postId, like: true}).exec();
+    const likesCount = postLikes.length
+    const userLike = await PostLikes.findOne({post: postId, fromUser: userId, like: true}).exec();
+
+    postObject.likesCount = likesCount;
+    postObject.userLiked = !!userLike;
+
+    return postObject
+}
+
 
 const Post = mongoose.model('Post', postSchema)
 

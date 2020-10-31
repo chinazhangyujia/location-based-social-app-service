@@ -24,7 +24,7 @@ router.get('/post', auth, async (req, res) => {
     }
 })
 
-router.get('/allPosts', async (req, res) => {
+router.get('/allPosts', auth, async (req, res) => {
     try {
         const longitude = parseFloat(req.query.long);
         const latitude = parseFloat(req.query.lat);
@@ -33,7 +33,8 @@ router.get('/allPosts', async (req, res) => {
             location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } }
         }).sort({_id: -1}).populate('owner').exec();
 
-        res.status(200).send(posts);
+        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+
     }
     catch (e) {
         res.status(500).send('Failed to get posts');
@@ -72,7 +73,7 @@ router.get('/friendPosts', auth, async (req, res) => {
             return (item._id.toString()) !== array[index - 1]._id.toString()
         })
 
-        res.status(200).send(posts);
+        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
     }
     catch (e) {
         res.status(500).send("Failed to get friends' posts");
@@ -92,7 +93,7 @@ router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
             .sort({_id: -1})
             .exec();
 
-        res.status(200).send(posts);
+        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
 
     } catch (e) {
         res.status(400).send('Failed to get posts with unnotified comment');
@@ -113,5 +114,15 @@ router.post('/post', auth, async (req, res) => {
         res.status(500).send(e);
     }
 })
+
+const addLikesDataToPosts = async (posts, userId) => {
+    const postsWithLikesData = [];
+    for (post of posts) {
+        const postWithLikesData = await post.addLikesData(userId);
+        postsWithLikesData.push(postWithLikesData);
+    }
+
+    return postsWithLikesData;
+}
 
 module.exports = router
