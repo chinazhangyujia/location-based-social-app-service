@@ -24,7 +24,11 @@ router.post("/generatePresignedUrl", auth, (req, res) => {
 
     fileType = fileType.substring(1, fileType.length);
 
-    const folder = "post_image";
+    const folder = req.body.folder;
+    if (!folder) {
+        return;
+    }
+
     const fileName = uuid.v4();
     const s3Params = {
         Bucket: S3_BUCKET,
