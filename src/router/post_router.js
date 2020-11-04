@@ -29,9 +29,25 @@ router.get('/allPosts', auth, async (req, res) => {
         const longitude = parseFloat(req.query.long);
         const latitude = parseFloat(req.query.lat);
 
-        const posts = await Post.find({
-            location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } }
-        }).sort({_id: -1}).populate('owner').exec();
+        const query = !!req.query.fromId ?
+            Post.find({
+                _id: {$lt: req.query.fromId},
+                location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } },
+            }) :
+            Post.find({
+                location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } }
+            });
+
+        const posts = (!!req.query.fetchSize) ?
+            await query
+                .limit(parseInt(req.query.fetchSize))
+                .sort({_id: -1})
+                .populate('owner')
+                .exec() :
+            await query
+                .sort({_id: -1})
+                .populate('owner')
+                .exec();
 
         res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
 
