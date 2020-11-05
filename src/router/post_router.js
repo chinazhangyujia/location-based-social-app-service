@@ -62,11 +62,45 @@ router.get('/friendPosts', auth, async (req, res) => {
         const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
         friends.push(req.user._id);
 
-        const friendPosts = await Post.find({
-            owner: {$in: friends}
-        }).sort({_id: -1}).populate('owner').exec();
+        const fromId = req.query.fromId;
+        const limit = req.query.fetchSize; // nonnull
 
-        const commentedPosts = await Comment.find({sendFrom: req.user._id}, 'post').distinct('post').populate('post').exec();
+        const friendPostsQuery = fromId ? Post.find({
+            _id: {$lt: fromId},
+            owner: {$in: friends},
+        }) : Post.find({
+            owner: {$in: friends},
+        });
+
+        const friendPosts = await friendPostsQuery
+            .limit(parseInt(limit))
+            .sort({_id: -1})
+            .populate('owner')
+            .exec();
+
+        const commentedPostsIds = fromId ? await Comment
+            .aggregate(
+            [
+                { "$match": {
+                        post: {$lt: fromId},
+                        sendFrom: req.user._id} },
+                { "$group": { _id: "$post" } },
+                { "$sort":  { _id: -1 } },
+                { "$limit": parseInt(limit) }
+            ]
+        ).exec() :
+            await Comment
+                .aggregate(
+                    [
+                        { "$match": {
+                                sendFrom: req.user._id} },
+                        { "$group": { _id: "$post" } },
+                        { "$sort":  { _id: -1 } },
+                        { "$limit": parseInt(limit) }
+                    ]
+                ).exec();
+
+        const commentedPosts = await Post.find({_id: {$in: commentedPostsIds.map(e => e._id)}}).exec();
 
         const compare = (a, b) => {
             if ((a._id.toString()) < (b._id.toString())) {
@@ -88,6 +122,8 @@ router.get('/friendPosts', auth, async (req, res) => {
 
             return (item._id.toString()) !== array[index - 1]._id.toString()
         })
+
+        posts = posts.slice(0, Math.min(limit, posts.length));
 
         res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
     }
