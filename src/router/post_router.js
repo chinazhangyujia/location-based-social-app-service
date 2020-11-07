@@ -132,6 +132,7 @@ router.get('/friendPosts', auth, async (req, res) => {
     }
 })
 
+// deprecated
 router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
     try {
         const postIds = await CommentNotification

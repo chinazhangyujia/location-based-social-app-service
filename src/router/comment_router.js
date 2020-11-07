@@ -41,28 +41,53 @@ router.post('/comment', auth, async (req, res) => {
             return;
         }
 
-        await CommentNotification.findOneAndUpdate(
-            {toUser: post.owner, post: post._id },
-            {notified: false}, { upsert: true }).exec();
+        if (!req.body.sendTo) {
+            const commentNotification = new CommentNotification({
+                toUser: post.owner,
+                comment: comment._id,
+                post: post._id,
+                notified: false
+            })
 
-        if (!req.body.sendTo || req.body.sendTo.toString() === post.owner.toString()) {
+            commentNotification.save();
             return;
         }
 
-        CommentNotification.findOneAndUpdate(
-            {toUser: req.body.sendTo, post: post._id },
-            {notified: false}, { upsert: true }).exec()
+        const replyNotification = new CommentNotification({
+            toUser: req.body.sendTo,
+            comment: comment._id,
+            post: post._id,
+            notified: false
+        })
+
+        replyNotification.save();
 
     } catch (e) {
         // log exception
     }
 })
 
+router.get('/unnotifiedComments', auth, async (req, res) => {
+    try {
+        const commentNotification = await CommentNotification
+            .find({toUser: req.user._id, notified: false})
+            .sort({_id: -1})
+            .populate('comment')
+            .populate({path: 'comment', populate: {path: 'sendFrom'}})
+            .exec();
+
+        res.status(200).send(commentNotification);
+
+    } catch (e) {
+        res.status(500).send('Failed to get comment notifications');
+    }
+})
+
 router.post('/markNotificationNotified', auth, async (req, res) => {
 
     try {
-        const postIds = req.body.postIds;
-        await CommentNotification.updateMany({post: {$in: (postIds)}, toUser: req.user._id}, {notified: true});
+        const notificationIds = req.body.notificationIds;
+        await CommentNotification.updateMany({_id: {$in: notificationIds}}, {notified: true});
 
         res.status(200).send();
     }

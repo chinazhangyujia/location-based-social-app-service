@@ -4,7 +4,13 @@ const commentNotificationSchema = new mongoose.Schema({
     toUser: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
-        index: true
+        index: true,
+        required: true
+    },
+    comment: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Comment',
+        required: true
     },
     post: {
         type: mongoose.Schema.Types.ObjectId,
@@ -19,8 +25,6 @@ const commentNotificationSchema = new mongoose.Schema({
 }, {
     timestamps: true
 })
-
-commentNotificationSchema.index({ toUser: 1, post: 1}, { unique: true });
 
 const CommentNotification = mongoose.model('CommentNotification', commentNotificationSchema)
 
