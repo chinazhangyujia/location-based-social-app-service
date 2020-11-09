@@ -4,6 +4,7 @@ const Post = require('../model/post');
 const Friend = require('../model/friend');
 const Comment = require('../model/comment');
 const CommentNotification = require('../model/comment_notification');
+const PostLikes = require('../model/post_likes');
 const auth = require('../middleware/auth');
 
 const METERS_PER_MILE = 1609.34;
@@ -40,8 +41,8 @@ router.get('/allPosts', auth, async (req, res) => {
 
         const posts = (!!req.query.fetchSize) ?
             await query
-                .limit(parseInt(req.query.fetchSize))
                 .sort({_id: -1})
+                .limit(parseInt(req.query.fetchSize))
                 .populate('owner')
                 .exec() :
             await query
@@ -73,8 +74,8 @@ router.get('/friendPosts', auth, async (req, res) => {
         });
 
         const friendPosts = await friendPostsQuery
-            .limit(parseInt(limit))
             .sort({_id: -1})
+            .limit(parseInt(limit))
             .populate('owner')
             .exec();
 
@@ -129,6 +130,64 @@ router.get('/friendPosts', auth, async (req, res) => {
     }
     catch (e) {
         res.status(500).send("Failed to get friends' posts");
+    }
+})
+
+router.get('/myPosts', auth, async (req, res) => {
+    try {
+        const fromId = req.query.fromId;
+        const limit = req.query.fetchSize; // nonnull
+
+        const myPostsQuery = fromId ? Post.find({
+            _id: {$lt: fromId},
+            owner: req.user._id,
+        }) : Post.find({
+            owner: req.user._id,
+        });
+
+        const myPosts = await myPostsQuery
+            .sort({_id: -1})
+            .limit(parseInt(limit))
+            .populate('owner')
+            .exec();
+
+        res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
+
+    } catch (e) {
+        res.status(400).send("Failed to get login user's posts");
+    }
+})
+
+router.get('/likedPosts', auth, async (req, res) => {
+    try {
+        const fromId = req.query.fromId;
+        const limit = req.query.fetchSize; // nonnull
+
+        const query = fromId ? PostLikes.find({
+            post: {$lt: fromId},
+            fromUser: req.user._id,
+            like: true
+        }) : PostLikes.find({
+            fromUser: req.user._id,
+            like: true
+        });
+
+        const postIds = await query
+            .select('post')
+            .sort({post: -1})
+            .limit(parseInt(limit))
+            .exec();
+
+        const posts = await Post
+            .find({_id: {$in: postIds.map(e => e.post)}})
+            .populate('owner')
+            .sort({_id: -1})
+            .exec();
+
+        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+
+    } catch (e) {
+        res.status(400).send('Failed to get liked posts');
     }
 })
 
