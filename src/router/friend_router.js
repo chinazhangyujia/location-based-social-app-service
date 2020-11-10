@@ -23,6 +23,43 @@ router.get('/friends', auth, async (req, res) => {
     }
 })
 
+router.get('/friendStatus', auth, async (req, res) => {
+    try {
+        const targetUser = req.query.user;
+        if (!targetUser) {
+            res.status(400).send('No target user Id passed in');
+            return;
+        }
+
+        if (targetUser.toString() === req.user._id.toString()) {
+            res.status(200).send('N/A');
+            return;
+        }
+
+        const friendship = await Friend.findOne({user: req.user._id, friendUser: targetUser, status: 'active'});
+        const pendingRequest = await AddFriendRequest.findOne({toUser: targetUser, fromUser: req.user._id, status: 'pending'});
+
+        let friendStatus;
+        if (!friendship && !pendingRequest) {
+            friendStatus = 'NOT_FRIEND';
+        }
+        else if (!friendship && !!pendingRequest) {
+            friendStatus = 'PENDING';
+        }
+        else if (!!friendship && !pendingRequest) {
+            friendStatus = 'IS_FRIEND';
+        }
+        else {
+            friendStatus = 'UNKNOWN';
+        }
+
+        res.status(200).send(friendStatus);
+    }
+    catch (e) {
+        res.status(500).send('Failed to get friend status');
+    }
+})
+
 router.post('/cancelFriendship', auth, async (req, res) => {
     try {
         const friendUserId = req.body.friendUser;
