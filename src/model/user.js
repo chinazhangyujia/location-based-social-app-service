@@ -49,7 +49,7 @@ const userSchema = new mongoose.Schema({
     },
     avatarUrl: {
         type: String,
-        default: 'https://cdn.pixabay.com/photo/2014/10/23/18/05/burger-500054_1280.jpg'
+        default: 'https://location-based-social-app.s3.us-east-2.amazonaws.com/user_avatar/default_avatar.jpg'
     },
     token: {
         type: String,
