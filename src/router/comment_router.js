@@ -67,33 +67,4 @@ router.post('/comment', auth, async (req, res) => {
     }
 })
 
-router.get('/unnotifiedComments', auth, async (req, res) => {
-    try {
-        const commentNotification = await CommentNotification
-            .find({toUser: req.user._id, notified: false})
-            .sort({_id: -1})
-            .populate('comment')
-            .populate({path: 'comment', populate: {path: 'sendFrom'}})
-            .exec();
-
-        res.status(200).send(commentNotification);
-
-    } catch (e) {
-        res.status(500).send('Failed to get comment notifications');
-    }
-})
-
-router.post('/markNotificationNotified', auth, async (req, res) => {
-
-    try {
-        const notificationIds = req.body.notificationIds;
-        await CommentNotification.updateMany({_id: {$in: notificationIds}}, {notified: true});
-
-        res.status(200).send();
-    }
-    catch (e) {
-        res.status(500).send('Failed to mark post as notified');
-    }
-})
-
 module.exports = router

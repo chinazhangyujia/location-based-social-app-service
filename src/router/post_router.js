@@ -58,7 +58,11 @@ router.get('/allPosts', auth, async (req, res) => {
     }
 })
 
-router.get('/friendPosts', auth, async (req, res) => {
+/**
+ * @deprecated
+ * Fetch my posts, friends' posts and commented posts
+ */
+router.get('/relevantPosts', auth, async (req, res) => {
     try {
         const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
         friends.push(req.user._id);
@@ -133,6 +137,33 @@ router.get('/friendPosts', auth, async (req, res) => {
     }
 })
 
+router.get('/friendPosts', auth, async (req, res) => {
+    try {
+        const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
+
+        const fromId = req.query.fromId;
+        const limit = req.query.fetchSize; // nonnull
+
+        const friendPostsQuery = fromId ? Post.find({
+            _id: {$lt: fromId},
+            owner: {$in: friends},
+        }) : Post.find({
+            owner: {$in: friends},
+        });
+
+        const friendPosts = await friendPostsQuery
+            .sort({_id: -1})
+            .limit(parseInt(limit))
+            .populate('owner')
+            .exec();
+
+        res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
+    }
+    catch (e) {
+        res.status(500).send("Failed to get friends' posts");
+    }
+})
+
 router.get('/myPosts', auth, async (req, res) => {
     try {
         const fromId = req.query.fromId;
@@ -191,7 +222,9 @@ router.get('/likedPosts', auth, async (req, res) => {
     }
 })
 
-// deprecated
+/**
+ * @deprecated
+ */
 router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
     try {
         const postIds = await CommentNotification

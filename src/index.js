@@ -7,6 +7,7 @@ const fileUploadRouter = require('./router/file_upload_router');
 const commentRouter = require('./router/comment_router');
 const friendRouter = require('./router/friend_router');
 const postLikesRouter = require('./router/post_likes_router');
+const notificationRouter = require('./router/notification_router');
 
 const app = express();
 const port = process.env.PORT;
@@ -22,3 +23,4 @@ app.use(fileUploadRouter);
 app.use(commentRouter);
 app.use(friendRouter);
 app.use(postLikesRouter);
+app.use(notificationRouter);
