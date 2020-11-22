@@ -19,4 +19,26 @@ const auth = async (req, res, next) => {
     }
 }
 
-module.exports = auth
+const websocket_auth = async (socket, next) => {
+    try {
+
+        console.log('websocket_auth')
+        const token = socket.handshake.headers['Authorization'].replace('Bearer ', '')
+        const decoded = jwt.verify(token, privateKey)
+        const user = await User.findOne({ _id: decoded._id, token: token })
+
+        if (!user) {
+            console.log('websocket_auth_failed')
+
+            throw new Error()
+        }
+
+        socket.token = token
+        socket.user = user
+        next()
+    } catch (e) {
+        throw e;
+    }
+}
+
+module.exports = { auth, websocket_auth }

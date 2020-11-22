@@ -5,7 +5,7 @@ const Friend = require('../model/friend');
 const Comment = require('../model/comment');
 const CommentNotification = require('../model/comment_notification');
 const PostLikes = require('../model/post_likes');
-const auth = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 const METERS_PER_MILE = 1609.34;
 

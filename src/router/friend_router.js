@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const auth = require('../middleware/auth')
+const { auth } = require('../middleware/auth')
 const Friend = require('../model/friend')
 const AddFriendRequest = require('../model/add_friend_request')
 

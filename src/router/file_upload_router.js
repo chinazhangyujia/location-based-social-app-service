@@ -2,7 +2,7 @@ const express = require("express");
 const AWS = require("aws-sdk");
 // const awsConfig = require("../config/aws-s3-config");
 const uuid = require("uuid");
-const auth = require('../middleware/auth')
+const { auth } = require('../middleware/auth')
 const router = express.Router()
 
 const S3_BUCKET = process.env.S3_BUCKET_NAME

@@ -1,6 +1,6 @@
 const express = require('express')
 const { User } = require('../model/user')
-const auth = require('../middleware/auth')
+const { auth } = require('../middleware/auth')
 const router = express.Router()
 const Friend = require('../model/friend')
 const AddFriendRequest = require('../model/add_friend_request')
