@@ -110,9 +110,7 @@ router.post('/user/updateUserInfo', auth, async (req, res) => {
         const avatarUrl = req.body.avatarUrl;
 
         const infoToUpdate = {};
-        if (introduction) {
-            infoToUpdate.introduction = introduction;
-        }
+        infoToUpdate.introduction = introduction;
 
         if (avatarUrl) {
             infoToUpdate.avatarUrl = avatarUrl;

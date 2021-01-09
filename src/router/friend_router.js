@@ -37,7 +37,10 @@ router.get('/friendStatus', auth, async (req, res) => {
         }
 
         const friendship = await Friend.findOne({user: req.user._id, friendUser: targetUser, status: 'active'});
-        const pendingRequest = await AddFriendRequest.findOne({toUser: targetUser, fromUser: req.user._id, status: 'pending'});
+        const pendingRequest = await AddFriendRequest.findOne({$or: [
+            {toUser: targetUser, fromUser: req.user._id, status: 'pending'},
+            {toUser: req.user._id, fromUser: targetUser, status: 'pending'},
+        ]});
 
         let friendStatus;
         if (!friendship && !pendingRequest) {
