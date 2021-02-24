@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth')
+const auth = require('../middleware/auth')
 const PostLikes = require('../model/post_likes')
 const Post = require('../model/post')
 const LikeNotification = require('../model/like_notification')
@@ -11,9 +11,8 @@ const LikeNotification = require('../model/like_notification')
 router.post('/likePost', auth, async (req, res) => {
 
     try {
-        PostLikes.findOneAndUpdate(
-            {fromUser: req.user._id, post: req.body.postId },
-            {like: req.body.like}, { upsert: true }).exec()
+        await PostLikes.findOneAndUpdate(
+            {fromUser: req.user._id, post: req.body.postId }, {like: req.body.like}, {upsert: true}).exec()
 
         res.status(200).send();
 
@@ -31,14 +30,17 @@ router.post('/likePost', auth, async (req, res) => {
                 notified: false
             })
 
-            notification.save();
+            LikeNotification.create(notification);
 
         } catch (e) {
-            // log exception
+            const errorMessage = 'Failed to record like notification for req ' + JSON.parse(JSON.stringify(req));
+            console.log(errorMessage, e);
         }
     }
     catch (e) {
-        res.status(500).send('Failed to like the post');
+        const errorMessage = 'Failed to like or dislike post for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 
 })

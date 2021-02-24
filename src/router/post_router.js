@@ -5,10 +5,14 @@ const Friend = require('../model/friend');
 const Comment = require('../model/comment');
 const CommentNotification = require('../model/comment_notification');
 const PostLikes = require('../model/post_likes');
-const { auth } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 
 const METERS_PER_MILE = 1609.34;
+const DEFAULT_FETCH_SIZE = 5;
 
+/**
+ * @deprecated
+ */
 router.get('/post', auth, async (req, res) => {
     try {
         const longitude = parseFloat(req.query.long);
@@ -21,7 +25,9 @@ router.get('/post', auth, async (req, res) => {
         res.status(200).send(posts);
     }
     catch (e) {
-        res.status(400).send('Failed to get posts for user ' + req.user.uniqueName);
+        const errorMessage = 'Failed to get posts for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -47,6 +53,7 @@ router.get('/allPosts', auth, async (req, res) => {
                 .exec() :
             await query
                 .sort({_id: -1})
+                .limit(DEFAULT_FETCH_SIZE)
                 .populate('owner')
                 .exec();
 
@@ -54,7 +61,9 @@ router.get('/allPosts', auth, async (req, res) => {
 
     }
     catch (e) {
-        res.status(500).send('Failed to get posts');
+        const errorMessage = 'Failed to get posts for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -142,7 +151,7 @@ router.get('/friendPosts', auth, async (req, res) => {
         const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
 
         const fromId = req.query.fromId;
-        const limit = req.query.fetchSize; // nonnull
+        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
         const friendPostsQuery = fromId ? Post.find({
             _id: {$lt: fromId},
@@ -160,14 +169,16 @@ router.get('/friendPosts', auth, async (req, res) => {
         res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
     }
     catch (e) {
-        res.status(500).send("Failed to get friends' posts");
+        const errorMessage = "Failed to get friends' posts for req " + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
 router.get('/myPosts', auth, async (req, res) => {
     try {
         const fromId = req.query.fromId;
-        const limit = req.query.fetchSize; // nonnull
+        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
         const myPostsQuery = fromId ? Post.find({
             _id: {$lt: fromId},
@@ -185,14 +196,16 @@ router.get('/myPosts', auth, async (req, res) => {
         res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
 
     } catch (e) {
-        res.status(400).send("Failed to get login user's posts");
+        const errorMessage = "Failed to get login user's posts for req " + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
 router.get('/likedPosts', auth, async (req, res) => {
     try {
         const fromId = req.query.fromId;
-        const limit = req.query.fetchSize; // nonnull
+        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
         const query = fromId ? PostLikes.find({
             post: {$lt: fromId},
@@ -218,7 +231,9 @@ router.get('/likedPosts', auth, async (req, res) => {
         res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
 
     } catch (e) {
-        res.status(400).send('Failed to get liked posts');
+        const errorMessage = 'Failed to get liked posts for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -252,11 +267,13 @@ router.post('/post', auth, async (req, res) => {
     })
 
     try {
-        await post.save();
+        await Post.create(post);
         res.status(200).send(post);
     }
     catch (e) {
-        res.status(500).send(e);
+        const errorMessage = 'Failed create a post for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 

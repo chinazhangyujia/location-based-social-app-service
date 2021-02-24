@@ -1,8 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth');
+const auth = require('../middleware/auth');
 const CommentNotification = require('../model/comment_notification');
 const LikeNotification = require('../model/like_notification');
+
+const EARLIEST_NOTIFICATION_MONTH_BEFORE = 1;
 
 router.get('/commentNotifications', auth, async (req, res) => {
     try {
@@ -16,7 +18,9 @@ router.get('/commentNotifications', auth, async (req, res) => {
         res.status(200).send(commentNotification);
 
     } catch (e) {
-        res.status(500).send('Failed to get comment notifications');
+        const errorMessage = 'Failed to get comment notifications for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -31,14 +35,16 @@ router.get('/likeNotifications', auth, async (req, res) => {
         res.status(200).send(likeNotifications);
 
     } catch (e) {
-        res.status(500).send('Failed to get comment notifications');
+        const errorMessage = 'Failed to get like notifications for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
 router.get('/allNotifications', auth, async (req, res) => {
     try {
         let earliestFetchDate = new Date();
-        earliestFetchDate.setMonth(earliestFetchDate.getMonth() - 1);
+        earliestFetchDate.setMonth(earliestFetchDate.getMonth() - EARLIEST_NOTIFICATION_MONTH_BEFORE);
 
         let commentNotifications = await CommentNotification
             .find({toUser: req.user._id, createdAt: {$gte: earliestFetchDate}})
@@ -88,7 +94,9 @@ router.get('/allNotifications', auth, async (req, res) => {
         res.status(200).send(notifications);
 
     } catch (e) {
-        res.status(500).send('Failed to get notifications');
+        const errorMessage = 'Failed to get notifications for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -109,7 +117,9 @@ router.post('/markNotificationNotified', auth, async (req, res) => {
         res.status(200).send();
     }
     catch (e) {
-        res.status(500).send('Failed to mark notifications as notified');
+        const errorMessage = 'Failed to mark notifications as notified for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 

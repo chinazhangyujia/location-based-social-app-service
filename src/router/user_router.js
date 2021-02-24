@@ -1,23 +1,33 @@
 const express = require('express')
 const { User } = require('../model/user')
-const { auth } = require('../middleware/auth')
+const auth = require('../middleware/auth')
 const router = express.Router()
 const Friend = require('../model/friend')
 const AddFriendRequest = require('../model/add_friend_request')
 
 router.post('/user/signup', async (req, res) => {
-    const user = new User(req.body)
-
     try {
-        await user.save()
-        const token = await user.generateAuthToken()
-        res.status(200).send({ user, token })
+        const nickName = req.body.name;
+        const uniqueNumber = await User.countDocuments({ name: nickName }).exec();
+        const uniqueName = nickName + '_' + uniqueNumber;
+        const exitingUniqueName = await User.find({ uniqueName: uniqueName }).exec();
+
+        if (exitingUniqueName.length !== 0) {
+            console.log(`unique name ${exitingUniqueName} already exist`);
+            res.status(400).send({message: 'Please choose a different user name'});
+            return;
+        }
+        
+        const user = new User({
+            ...req.body,
+            uniqueName: uniqueName
+        });
+        await User.create(user);
+        const token = await user.generateAuthToken();
+        res.status(200).send({ user, token });
     } catch (e) {
         let error = {};
-        if (e.keyPattern?.uniqueName) {
-            error.message = 'Duplicated unique name';
-        }
-        else if (e.keyPattern?.email) {
+        if (e.keyPattern?.email) {
             error.message = 'Duplicated email';
         }
         else {
@@ -33,7 +43,9 @@ router.post('/user/login', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
     } catch (e) {
-        res.status(400).send(e)
+        const errorMessage = 'User failed to login ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -44,7 +56,9 @@ router.post('/user/logout', auth, async (req, res) => {
 
         res.send()
     } catch (e) {
-        res.status(500).send()
+        const errorMessage = 'User failed to logout ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -55,7 +69,9 @@ router.get('/userById/:id', async (req, res) => {
         res.status(200).send(user);
     }
     catch (e) {
-        res.status(400).send('Failed to find user info');
+        const errorMessage = 'Failed to find user info for userId ' + req.params.id;
+        console.log(errorMessage, e);
+        res.status(400).send(errorMessage);
     }
 })
 
@@ -96,7 +112,9 @@ router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
         res.status(200).send(userObject);
     }
     catch (e) {
-        res.status(500).send('Failed to get users for unique name');
+        const errorMessage = 'Failed to find user info for unique name ' + req.params.uniqueName;
+        console.log(errorMessage, e);
+        res.status(400).send(errorMessage);
     }
 })
 
@@ -119,7 +137,9 @@ router.post('/user/updateUserInfo', auth, async (req, res) => {
         const updatedInfo = await User.updateOne({_id: req.user._id}, infoToUpdate);
         res.status(200).send(updatedInfo);
     } catch (e) {
-        res.status(500).send('Failed to update user info');
+        const errorMessage = 'Failed to update user info ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 

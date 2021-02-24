@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth')
+const auth = require('../middleware/auth')
 const Comment = require('../model/comment')
 const Post = require('../model/post')
 const CommentNotification = require('../model/comment_notification')
@@ -16,7 +16,9 @@ router.get('/comment/:postId', async (req, res) => {
         res.status(200).send(comments);
     }
     catch (e) {
-        res.status(400).send('Failed to get comments for post');
+        const errorMessage = 'Failed to get comments for request ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(400).send(errorMessage);
     }
 })
 
@@ -27,18 +29,22 @@ router.post('/comment', auth, async (req, res) => {
     })
 
     try {
-        await comment.save();
+        await Comment.create(comment);
         res.status(200).send(comment);
+        // if successfully created comment, we want to create notification then
     }
     catch (e) {
-        res.status(500).send('Failed to post comment');
+        const errorMessage = 'Failed to post comment for request ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(400).send(errorMessage);
+        return;
     }
 
     // record notification
     try {
         const post = await Post.findById(req.body.post).exec();
         if (req.user._id.toString() === post.owner.toString()) {
-            return;
+            return; // if it is a comment by the poster, don't send notification
         }
 
         if (!req.body.sendTo) {
@@ -49,7 +55,7 @@ router.post('/comment', auth, async (req, res) => {
                 notified: false
             })
 
-            commentNotification.save();
+            CommentNotification.create(commentNotification);
             return;
         }
 
@@ -60,10 +66,10 @@ router.post('/comment', auth, async (req, res) => {
             notified: false
         })
 
-        replyNotification.save();
+        CommentNotification.create(replyNotification);
 
     } catch (e) {
-        // log exception
+        console.log('Failed to create notification after inserted comment for request ' + JSON.parse(JSON.stringify(req)), e);
     }
 })
 

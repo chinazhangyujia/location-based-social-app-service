@@ -1,5 +1,8 @@
 const mongoose = require('mongoose')
 
+/**
+ * each friends pair will be stored as two documents
+ */
 const friendSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { auth } = require('../middleware/auth')
+const auth = require('../middleware/auth')
 const ChatMessage = require('../model/chat_message')
 const ChatThread = require('../model/chat_thread')
 
@@ -28,7 +28,9 @@ router.get('/chatMessage', auth, async (req, res) => {
         res.status(200).send(messages);
     }
     catch (e) {
-        res.status(400).send('Failed to get chat message for thread');
+        const errorMessage = 'Failed to get chat message for request ' + JSON.stringify(req);
+        console.log(errorMessage);
+        res.status(400).send(errorMessage);
     }
 })
 
@@ -81,7 +83,9 @@ router.get('/chatThreadSummaries', auth, async (req, res) => {
         res.status(200).send(threadSummaries);
     }
     catch (e) {
-        res.status(400).send('Failed to get all chat thread summaries for user ' + req.user._id);
+        const errorMessage = 'Failed to get all chat thread summaries for request ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(400).send(errorMessage);
     }
 })
 

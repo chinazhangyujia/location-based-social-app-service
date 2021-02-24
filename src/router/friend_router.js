@@ -1,13 +1,17 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
-const { auth } = require('../middleware/auth')
+const auth = require('../middleware/auth')
 const Friend = require('../model/friend')
 const AddFriendRequest = require('../model/add_friend_request')
 
 /**
- * Friend
+ * This class includes endpoints for both friendship and friend request
  */
+
+ /**
+  * Friendship endpoints
+  */
 router.get('/friends', auth, async (req, res) => {
     try {
         const friends = await Friend.find({user: req.user._id, status: 'active'})
@@ -19,7 +23,9 @@ router.get('/friends', auth, async (req, res) => {
         res.status(200).send(friends);
     }
     catch (e) {
-        res.status(400).send('Failed to fetch friends info');
+        const errorMessage = 'Failed to fetch friends info for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e)
+        res.status(400).send(errorMessage);
     }
 })
 
@@ -27,6 +33,7 @@ router.get('/friendStatus', auth, async (req, res) => {
     try {
         const targetUser = req.query.user;
         if (!targetUser) {
+            console.log('No target user Id passed in for req ' + JSON.parse(JSON.stringify(req)));
             res.status(400).send('No target user Id passed in');
             return;
         }
@@ -59,7 +66,9 @@ router.get('/friendStatus', auth, async (req, res) => {
         res.status(200).send(friendStatus);
     }
     catch (e) {
-        res.status(500).send('Failed to get friend status');
+        const errorMessage = 'Failed to get friend status for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -70,13 +79,15 @@ router.post('/cancelFriendship', auth, async (req, res) => {
         await Friend.findOneAndUpdate({user: friendUserId, friendUser: req.user._id}, {status: 'cancelled'});
         res.status(200).send({friendUser: friendUserId});
     } catch (e) {
-        res.status(400).send('Failed to delete friend');
+        const errorMessage = 'Failed to delete friend for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
 
 /**
- * Friend request
+ * Friend request endpoints
  */
 router.post('/addFriendRequest', auth, async (req, res) => {
     try {
@@ -87,12 +98,13 @@ router.post('/addFriendRequest', auth, async (req, res) => {
             notified: false
         })
 
-
-        await friendRequest.save();
+        await AddFriendRequest.create(friendRequest);
         res.status(200).send();
     }
     catch (e) {
-        res.status(500).send('Failed to post comment');
+        const errorMessage = 'Failed to record add friend request for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -104,7 +116,9 @@ router.post('/markRequestAsNotified', auth, async (req, res) => {
         res.status(200).send();
     }
     catch (e) {
-        res.status(500).send('Failed to post comment');
+        const errorMessage = 'Failed to mark add friend request as notified for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -118,7 +132,9 @@ router.get('/pendingRequests', auth, async (req, res) => {
         res.status(200).send(pendingRequests);
     }
     catch (e) {
-        res.status(400).send();
+        const errorMessage = 'Failed to get pending add friend request for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
@@ -133,13 +149,14 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
         if (friendRequest.toUser.toString() !== req.user._id.toString()) {
             await session.abortTransaction();
             session.endSession();
+            console.log('Add friend request does not belong to this user, req: ' + JSON.parse(JSON.stringify(req)));
             res.status(400).send('Add friend request does not belong to this user');
             return
         }
 
         if (friendRequest.status === 'accepted') {
-            await Friend.findOneAndUpdate({user: req.user._id, friendUser: friendRequest.fromUser }, {status: 'active'}, { upsert: true }).exec();
-            await Friend.findOneAndUpdate({user: friendRequest.fromUser, friendUser: req.user._id }, {status: 'active'}, { upsert: true }).exec();
+            await Friend.findOneAndUpdate({user: req.user._id, friendUser: friendRequest.fromUser }, {status: 'active'}, { upsert: true, session: session }).exec();
+            await Friend.findOneAndUpdate({user: friendRequest.fromUser, friendUser: req.user._id }, {status: 'active'}, { upsert: true, session: session }).exec();
         }
 
         await session.commitTransaction();
@@ -148,7 +165,9 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
         res.status(200).send();
     }
     catch (e) {
-        res.status(500).send('Failed to post comment');
+        const errorMessage = 'Failed to handle friend request for req ' + JSON.parse(JSON.stringify(req));
+        console.log(errorMessage, e);
+        res.status(500).send(errorMessage);
     }
 })
 
