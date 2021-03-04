@@ -33,12 +33,12 @@ router.post('/likePost', auth, async (req, res) => {
             LikeNotification.create(notification);
 
         } catch (e) {
-            const errorMessage = 'Failed to record like notification for req ' + JSON.parse(JSON.stringify(req));
+            const errorMessage = 'Failed to record like notification for req ' + JSON.stringify(req.body);
             console.log(errorMessage, e);
         }
     }
     catch (e) {
-        const errorMessage = 'Failed to like or dislike post for req ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to like or dislike post for req ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }

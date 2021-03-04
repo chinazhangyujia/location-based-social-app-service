@@ -43,7 +43,7 @@ router.post('/user/login', async (req, res) => {
         const token = await user.generateAuthToken()
         res.status(200).send({ user, token })
     } catch (e) {
-        const errorMessage = 'User failed to login ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'User failed to login ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }
@@ -56,7 +56,7 @@ router.post('/user/logout', auth, async (req, res) => {
 
         res.send()
     } catch (e) {
-        const errorMessage = 'User failed to logout ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'User failed to logout ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }
@@ -137,7 +137,7 @@ router.post('/user/updateUserInfo', auth, async (req, res) => {
         const updatedInfo = await User.updateOne({_id: req.user._id}, infoToUpdate);
         res.status(200).send(updatedInfo);
     } catch (e) {
-        const errorMessage = 'Failed to update user info ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to update user info ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }

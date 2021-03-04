@@ -83,7 +83,7 @@ router.get('/chatThreadSummaries', auth, async (req, res) => {
         res.status(200).send(threadSummaries);
     }
     catch (e) {
-        const errorMessage = 'Failed to get all chat thread summaries for request ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to get all chat thread summaries for request ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(400).send(errorMessage);
     }

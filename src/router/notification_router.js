@@ -18,7 +18,7 @@ router.get('/commentNotifications', auth, async (req, res) => {
         res.status(200).send(commentNotification);
 
     } catch (e) {
-        const errorMessage = 'Failed to get comment notifications for req ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to get comment notifications for req ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }
@@ -35,7 +35,7 @@ router.get('/likeNotifications', auth, async (req, res) => {
         res.status(200).send(likeNotifications);
 
     } catch (e) {
-        const errorMessage = 'Failed to get like notifications for req ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to get like notifications for req ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }
@@ -94,7 +94,7 @@ router.get('/allNotifications', auth, async (req, res) => {
         res.status(200).send(notifications);
 
     } catch (e) {
-        const errorMessage = 'Failed to get notifications for req ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to get notifications for req ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }
@@ -117,7 +117,7 @@ router.post('/markNotificationNotified', auth, async (req, res) => {
         res.status(200).send();
     }
     catch (e) {
-        const errorMessage = 'Failed to mark notifications as notified for req ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to mark notifications as notified for req ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(500).send(errorMessage);
     }

@@ -16,7 +16,7 @@ router.get('/comment/:postId', async (req, res) => {
         res.status(200).send(comments);
     }
     catch (e) {
-        const errorMessage = 'Failed to get comments for request ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to get comments for request ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(400).send(errorMessage);
     }
@@ -34,7 +34,7 @@ router.post('/comment', auth, async (req, res) => {
         // if successfully created comment, we want to create notification then
     }
     catch (e) {
-        const errorMessage = 'Failed to post comment for request ' + JSON.parse(JSON.stringify(req));
+        const errorMessage = 'Failed to post comment for request ' + JSON.stringify(req.body);
         console.log(errorMessage, e);
         res.status(400).send(errorMessage);
         return;
@@ -69,7 +69,7 @@ router.post('/comment', auth, async (req, res) => {
         CommentNotification.create(replyNotification);
 
     } catch (e) {
-        console.log('Failed to create notification after inserted comment for request ' + JSON.parse(JSON.stringify(req)), e);
+        console.log('Failed to create notification after inserted comment for request ' + JSON.stringify(req.body), e);
     }
 })
 
