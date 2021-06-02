@@ -38,4 +38,7 @@ const sampleData = [
     },
 ]
 
-User.insertMany(sampleData)
+module.exports = async () => {
+    await User.collection.drop()
+    await User.insertMany(sampleData)
+}

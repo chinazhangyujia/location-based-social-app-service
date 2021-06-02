@@ -68,6 +68,38 @@ const sampleData = [
         "owner" : "000000000000000000000003",
     },
     {
+        "_id" : '100000000000000000000001',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at DC 1",
+        "location" : {
+            "coordinates" : [ 
+                -77.024642,
+                38.908759
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000003",
+    },
+    {
+        "_id" : '100000000000000000000002',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at DC 2",
+        "location" : {
+            "coordinates" : [ 
+                -77.024642,
+                38.908759
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000001",
+    },
+    {
         "_id" : '200000000000000000000000',
         "imageUrls" : [ 
             "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
@@ -84,12 +116,44 @@ const sampleData = [
         "owner" : "000000000000000000000001",
     },
     {
+        "_id" : '200000000000000000000001',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at Beijing 1",
+        "location" : {
+            "coordinates" : [ 
+                116.400839,
+                40.136114
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000003",
+    },
+    {
+        "_id" : '200000000000000000000002',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at Beijing 2",
+        "location" : {
+            "coordinates" : [ 
+                116.400839,
+                40.136114
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000000",
+    },
+    {
         "_id" : '300000000000000000000000',
         "imageUrls" : [ 
             "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
             "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
         ],
-        "content" : "post at Tokyo",
+        "content" : "post at Tokyo 0",
         "location" : {
             "coordinates" : [ 
                 139.755963,
@@ -98,7 +162,42 @@ const sampleData = [
             "type" : "Point"
         },
         "owner" : "000000000000000000000002",
+    },
+    {
+        "_id" : '300000000000000000000001',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at Tokyo 1",
+        "location" : {
+            "coordinates" : [ 
+                139.755963,
+                35.717237
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000001",
+    },
+    {
+        "_id" : '300000000000000000000002',
+        "imageUrls" : [ 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg", 
+            "https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg"
+        ],
+        "content" : "post at Tokyo 2",
+        "location" : {
+            "coordinates" : [ 
+                139.755963,
+                35.717237
+            ],
+            "type" : "Point"
+        },
+        "owner" : "000000000000000000000003",
     }
 ]
 
-Post.insertMany(sampleData);
+module.exports = async () => {
+    await Post.collection.drop()
+    await Post.insertMany(sampleData)
+}
