@@ -1,4 +1,6 @@
+/* eslint-disable no-underscore-dangle */
 const express = require('express');
+
 const router = express.Router();
 const Post = require('../model/post');
 const Friend = require('../model/friend');
@@ -10,281 +12,279 @@ const auth = require('../middleware/auth');
 const METERS_PER_MILE = 1609.34;
 const DEFAULT_FETCH_SIZE = 5;
 
+const addLikesDataToPosts = async (posts, userId) => {
+  const postsWithLikesData = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const post of posts) {
+    const postWithLikesData = post.addLikesData(userId);
+    postsWithLikesData.push(postWithLikesData);
+  }
+
+  // eslint-disable-next-line no-return-await
+  return await Promise.all(postsWithLikesData);
+};
+
 /**
  * @deprecated
  */
 router.get('/post', auth, async (req, res) => {
-    try {
-        const longitude = parseFloat(req.query.long);
-        const latitude = parseFloat(req.query.lat);
+  try {
+    const longitude = parseFloat(req.query.long);
+    const latitude = parseFloat(req.query.lat);
 
-        const posts = await Post.find({
-            owner: req.user._id,
-            location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } } })
-            .exec();
-        res.status(200).send(posts);
-    }
-    catch (e) {
-        const errorMessage = 'Failed to get posts for req ' + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+    const posts = await Post.find({
+      owner: req.user._id,
+      location: { $nearSphere: { $geometry: { type: 'Point', coordinates: [longitude, latitude] }, $maxDistance: METERS_PER_MILE } },
+    })
+      .exec();
+    res.status(200).send(posts);
+  } catch (e) {
+    const errorMessage = `Failed to get posts for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
 router.get('/allPosts', auth, async (req, res) => {
-    try {
-        const longitude = parseFloat(req.query.long);
-        const latitude = parseFloat(req.query.lat);
+  try {
+    const longitude = parseFloat(req.query.long);
+    const latitude = parseFloat(req.query.lat);
 
-        const query = !!req.query.fromId ?
-            Post.find({
-                _id: {$lt: req.query.fromId},
-                location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } },
-            }) :
-            Post.find({
-                location: { $nearSphere: { $geometry: { type: "Point", coordinates: [ longitude, latitude ] }, $maxDistance: METERS_PER_MILE } }
-            });
+    const query = req.query.fromId
+      ? Post.find({
+        _id: { $lt: req.query.fromId },
+        location: { $nearSphere: { $geometry: { type: 'Point', coordinates: [longitude, latitude] }, $maxDistance: METERS_PER_MILE } },
+      })
+      : Post.find({
+        location: { $nearSphere: { $geometry: { type: 'Point', coordinates: [longitude, latitude] }, $maxDistance: METERS_PER_MILE } },
+      });
 
-        const posts = (!!req.query.fetchSize) ?
-            await query
-                .sort({_id: -1})
-                .limit(parseInt(req.query.fetchSize))
-                .populate('owner')
-                .exec() :
-            await query
-                .sort({_id: -1})
-                .limit(DEFAULT_FETCH_SIZE)
-                .populate('owner')
-                .exec();
+    const posts = (req.query.fetchSize)
+      ? await query
+        .sort({ _id: -1 })
+        .limit(parseInt(req.query.fetchSize, 10))
+        .populate('owner')
+        .exec()
+      : await query
+        .sort({ _id: -1 })
+        .limit(DEFAULT_FETCH_SIZE)
+        .populate('owner')
+        .exec();
 
-        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
-
-    }
-    catch (e) {
-        const errorMessage = 'Failed to get posts for req ' + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+  } catch (e) {
+    const errorMessage = `Failed to get posts for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
 /**
  * @deprecated
  * Fetch my posts, friends' posts and commented posts
  */
 router.get('/relevantPosts', auth, async (req, res) => {
-    try {
-        const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
-        friends.push(req.user._id);
+  try {
+    const friends = await Friend.find({ user: req.user._id, status: 'active' }, 'friendUser').distinct('friendUser').exec();
+    friends.push(req.user._id);
 
-        const fromId = req.query.fromId;
-        const limit = req.query.fetchSize; // nonnull
+    const { fromId } = req.query;
+    const limit = req.query.fetchSize; // nonnull
 
-        const friendPostsQuery = fromId ? Post.find({
-            _id: {$lt: fromId},
-            owner: {$in: friends},
-        }) : Post.find({
-            owner: {$in: friends},
-        });
+    const friendPostsQuery = fromId ? Post.find({
+      _id: { $lt: fromId },
+      owner: { $in: friends },
+    }) : Post.find({
+      owner: { $in: friends },
+    });
 
-        const friendPosts = await friendPostsQuery
-            .sort({_id: -1})
-            .limit(parseInt(limit))
-            .populate('owner')
-            .exec();
+    const friendPosts = await friendPostsQuery
+      .sort({ _id: -1 })
+      .limit(parseInt(limit, 10))
+      .populate('owner')
+      .exec();
 
-        const commentedPostsIds = fromId ? await Comment
-            .aggregate(
-            [
-                { "$match": {
-                        post: {$lt: fromId},
-                        sendFrom: req.user._id} },
-                { "$group": { _id: "$post" } },
-                { "$sort":  { _id: -1 } },
-                { "$limit": parseInt(limit) }
-            ]
-        ).exec() :
-            await Comment
-                .aggregate(
-                    [
-                        { "$match": {
-                                sendFrom: req.user._id} },
-                        { "$group": { _id: "$post" } },
-                        { "$sort":  { _id: -1 } },
-                        { "$limit": parseInt(limit) }
-                    ]
-                ).exec();
+    const commentedPostsIds = fromId ? await Comment
+      .aggregate(
+        [
+          {
+            $match: {
+              post: { $lt: fromId },
+              sendFrom: req.user._id,
+            },
+          },
+          { $group: { _id: '$post' } },
+          { $sort: { _id: -1 } },
+          { $limit: parseInt(limit, 10) },
+        ],
+      ).exec()
+      : await Comment
+        .aggregate(
+          [
+            {
+              $match: { sendFrom: req.user._id },
+            },
+            { $group: { _id: '$post' } },
+            { $sort: { _id: -1 } },
+            { $limit: parseInt(limit, 10) },
+          ],
+        ).exec();
 
-        const commentedPosts = await Post.find({_id: {$in: commentedPostsIds.map(e => e._id)}}).exec();
+    const commentedPosts = await Post.find({ _id: { $in: commentedPostsIds.map((e) => e._id) } })
+      .exec();
 
-        const compare = (a, b) => {
-            if ((a._id.toString()) < (b._id.toString())) {
-                return 1;
-            }
-            else if ((a._id.toString()) > (b._id.toString())) {
-                return -1;
-            }
-            else {
-                return 0;
-            }
-        }
+    const compare = (a, b) => {
+      if ((a._id.toString()) < (b._id.toString())) {
+        return 1;
+      }
+      if ((a._id.toString()) > (b._id.toString())) {
+        return -1;
+      }
 
-        let posts = [...friendPosts, ...commentedPosts];
-        posts = posts.sort(compare).filter((item, index, array) => {
-            if (index === 0) {
-                return true;
-            }
+      return 0;
+    };
 
-            return (item._id.toString()) !== array[index - 1]._id.toString()
-        })
+    let posts = [...friendPosts, ...commentedPosts];
+    posts = posts.sort(compare).filter((item, index, array) => {
+      if (index === 0) {
+        return true;
+      }
 
-        posts = posts.slice(0, Math.min(limit, posts.length));
+      return (item._id.toString()) !== array[index - 1]._id.toString();
+    });
 
-        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
-    }
-    catch (e) {
-        res.status(500).send("Failed to get friends' posts");
-    }
-})
+    posts = posts.slice(0, Math.min(limit, posts.length));
+
+    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+  } catch (e) {
+    res.status(500).send("Failed to get friends' posts");
+  }
+});
 
 router.get('/friendPosts', auth, async (req, res) => {
-    try {
-        const friends = await Friend.find({user: req.user._id, status: 'active'}, 'friendUser').distinct('friendUser').exec();
+  try {
+    const friends = await Friend.find({ user: req.user._id, status: 'active' }, 'friendUser').distinct('friendUser').exec();
 
-        const fromId = req.query.fromId;
-        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
+    const { fromId } = req.query;
+    const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
-        const friendPostsQuery = fromId ? Post.find({
-            _id: {$lt: fromId},
-            owner: {$in: friends},
-        }) : Post.find({
-            owner: {$in: friends},
-        });
+    const friendPostsQuery = fromId ? Post.find({
+      _id: { $lt: fromId },
+      owner: { $in: friends },
+    }) : Post.find({
+      owner: { $in: friends },
+    });
 
-        const friendPosts = await friendPostsQuery
-            .sort({_id: -1})
-            .limit(parseInt(limit))
-            .populate('owner')
-            .exec();
+    const friendPosts = await friendPostsQuery
+      .sort({ _id: -1 })
+      .limit(parseInt(limit, 10))
+      .populate('owner')
+      .exec();
 
-        res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
-    }
-    catch (e) {
-        const errorMessage = "Failed to get friends' posts for req " + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+    res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
+  } catch (e) {
+    const errorMessage = `Failed to get friends' posts for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
 router.get('/myPosts', auth, async (req, res) => {
-    try {
-        const fromId = req.query.fromId;
-        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
+  try {
+    const { fromId } = req.query;
+    const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
-        const myPostsQuery = fromId ? Post.find({
-            _id: {$lt: fromId},
-            owner: req.user._id,
-        }) : Post.find({
-            owner: req.user._id,
-        });
+    const myPostsQuery = fromId ? Post.find({
+      _id: { $lt: fromId },
+      owner: req.user._id,
+    }) : Post.find({
+      owner: req.user._id,
+    });
 
-        const myPosts = await myPostsQuery
-            .sort({_id: -1})
-            .limit(parseInt(limit))
-            .populate('owner')
-            .exec();
+    const myPosts = await myPostsQuery
+      .sort({ _id: -1 })
+      .limit(parseInt(limit, 10))
+      .populate('owner')
+      .exec();
 
-        res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
-
-    } catch (e) {
-        const errorMessage = "Failed to get login user's posts for req " + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+    res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
+  } catch (e) {
+    const errorMessage = `Failed to get login user's posts for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
 router.get('/likedPosts', auth, async (req, res) => {
-    try {
-        const fromId = req.query.fromId;
-        const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
+  try {
+    const { fromId } = req.query;
+    const limit = req.query.fetchSize || DEFAULT_FETCH_SIZE;
 
-        const query = fromId ? PostLikes.find({
-            post: {$lt: fromId},
-            fromUser: req.user._id,
-            like: true
-        }) : PostLikes.find({
-            fromUser: req.user._id,
-            like: true
-        });
+    const query = fromId ? PostLikes.find({
+      post: { $lt: fromId },
+      fromUser: req.user._id,
+      like: true,
+    }) : PostLikes.find({
+      fromUser: req.user._id,
+      like: true,
+    });
 
-        const postIds = await query
-            .select('post')
-            .sort({post: -1})
-            .limit(parseInt(limit))
-            .exec();
+    const postIds = await query
+      .select('post')
+      .sort({ post: -1 })
+      .limit(parseInt(limit, 10))
+      .exec();
 
-        const posts = await Post
-            .find({_id: {$in: postIds.map(e => e.post)}})
-            .populate('owner')
-            .sort({_id: -1})
-            .exec();
+    const posts = await Post
+      .find({ _id: { $in: postIds.map((e) => e.post) } })
+      .populate('owner')
+      .sort({ _id: -1 })
+      .exec();
 
-        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
-
-    } catch (e) {
-        const errorMessage = 'Failed to get liked posts for req ' + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+  } catch (e) {
+    const errorMessage = `Failed to get liked posts for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
 /**
  * @deprecated
  */
 router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
-    try {
-        const postIds = await CommentNotification
-            .find({toUser: req.user._id, notified: false}, 'post')
-            .distinct('post')
-            .exec();
+  try {
+    const postIds = await CommentNotification
+      .find({ toUser: req.user._id, notified: false }, 'post')
+      .distinct('post')
+      .exec();
 
-        const posts = await Post
-            .find({_id: {$in: postIds}})
-            .populate('owner')
-            .sort({_id: -1})
-            .exec();
+    const posts = await Post
+      .find({ _id: { $in: postIds } })
+      .populate('owner')
+      .sort({ _id: -1 })
+      .exec();
 
-        res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
-
-    } catch (e) {
-        res.status(400).send('Failed to get posts with unnotified comment');
-    }
-})
+    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+  } catch (e) {
+    res.status(400).send('Failed to get posts with unnotified comment');
+  }
+});
 
 router.post('/post', auth, async (req, res) => {
-    const post = new Post({
-        ...req.body,
-        owner: req.user._id
-    })
+  const post = new Post({
+    ...req.body,
+    owner: req.user._id,
+  });
 
-    try {
-        await Post.create(post);
-        res.status(200).send(post);
-    }
-    catch (e) {
-        const errorMessage = 'Failed create a post for req ' + JSON.stringify(req.body);
-        console.log(errorMessage, e);
-        res.status(500).send(errorMessage);
-    }
-})
+  try {
+    await Post.create(post);
+    res.status(200).send(post);
+  } catch (e) {
+    const errorMessage = `Failed create a post for req ${JSON.stringify(req.body)}`;
+    console.log(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
 
-const addLikesDataToPosts = async (posts, userId) => {
-    const postsWithLikesData = [];
-    for (post of posts) {
-        const postWithLikesData = await post.addLikesData(userId);
-        postsWithLikesData.push(postWithLikesData);
-    }
-
-    return postsWithLikesData;
-}
-
-module.exports = router
+module.exports = router;
