@@ -43,20 +43,17 @@ router.post('/generatePresignedUrl', auth, (req, res) => {
     ACL: 'public-read',
   };
 
-  s3.getSignedUrl('putObject', s3Params, (err, data) => {
-    if (err) {
-      console.log(err);
-      return res.end();
-    }
-    const returnData = {
-      success: true,
-      message: 'Url generated',
-      uploadUrl: data,
-      downloadUrl:
+  const url = s3.getSignedUrl('putObject', s3Params);
+
+  const returnData = {
+    success: true,
+    message: 'Url generated',
+    uploadUrl: url,
+    downloadUrl:
                 `${`https://${S3_BUCKET}.s3.amazonaws.com/${folder}/${fileName}.`}${fileType}`,
-    };
-    return res.status(201).json(returnData);
-  });
+  };
+
+  return res.status(201).json(returnData);
 });
 
 module.exports = router;
