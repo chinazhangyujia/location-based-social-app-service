@@ -1,14 +1,14 @@
 const mongoose = require('mongoose');
 
 const chatThreadSchema = new mongoose.Schema({
-    participants: [{
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
-    }]
+  participants: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+  }],
 }, {
-    timestamps: true
-})
+  timestamps: true,
+});
 
-const ChatThread = mongoose.model('ChatThread', chatThreadSchema)
+const ChatThread = mongoose.model('ChatThread', chatThreadSchema);
 
-module.exports = ChatThread
+module.exports = ChatThread;

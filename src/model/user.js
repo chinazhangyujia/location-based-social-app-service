@@ -1,113 +1,115 @@
-const mongoose = require('mongoose')
-const validator = require('validator')
-const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
+/* eslint-disable no-underscore-dangle */
+const mongoose = require('mongoose');
+const validator = require('validator');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const JWT_PRIVATE_KEY = 'ILikeDumpling';
 
 const userSchema = new mongoose.Schema({
-    name: {
-        type: String,
-        required: true,
-        trim: true
+  name: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  uniqueName: {
+    type: String,
+    required: true,
+    trim: true,
+    index: {
+      unique: true,
     },
-    uniqueName: {
-        type: String,
-        required: true,
-        trim: true,
-        index: {
-            unique: true
-        }
+  },
+  email: {
+    type: String,
+    unique: true,
+    required: true,
+    trim: true,
+    lowercase: true,
+    validate(value) {
+      if (!validator.isEmail(value)) {
+        throw new Error('Email is invalid');
+      }
     },
-    email: {
-        type: String,
-        unique: true,
-        required: true,
-        trim: true,
-        lowercase: true,
-        validate(value) {
-            if (!validator.isEmail(value)) {
-                throw new Error('Email is invalid')
-            }
-        },
-        index: {
-            unique: true
-        }
+    index: {
+      unique: true,
     },
-    password: {
-        type: String,
-        required: true,
-        minlength: 7,
-        trim: true,
-    },
-    birthday: {
-        type: String,
-        required: true
-    },
-    introduction: {
-        type: String
-    },
-    avatarUrl: {
-        type: String,
-        default: 'https://location-based-social-app.s3.us-east-2.amazonaws.com/user_avatar/default_avatar.jpg'
-    },
-    token: {
-        type: String,
-    }
+  },
+  password: {
+    type: String,
+    required: true,
+    minlength: 7,
+    trim: true,
+  },
+  birthday: {
+    type: String,
+    required: true,
+  },
+  introduction: {
+    type: String,
+  },
+  avatarUrl: {
+    type: String,
+    default: 'https://location-based-social-app.s3.us-east-2.amazonaws.com/user_avatar/default_avatar.jpg',
+  },
+  token: {
+    type: String,
+  },
 }, {
-    timestamps: true
-})
+  timestamps: true,
+});
 
-userSchema.methods.toJSON = function () {
-    const user = this
-    const userObject = user.toObject()
+userSchema.methods.toJSON = () => {
+  const user = this;
+  const userObject = user.toObject();
 
-    delete userObject.password
-    delete userObject.token
+  delete userObject.password;
+  delete userObject.token;
 
-    return userObject
-}
+  return userObject;
+};
 
-userSchema.methods.generateAuthToken = async function () {
-    const user = this
-    const token = jwt.sign({ _id: user._id.toString() }, JWT_PRIVATE_KEY)
+userSchema.methods.generateAuthToken = async () => {
+  const user = this;
+  const token = jwt.sign({ _id: user._id.toString() }, JWT_PRIVATE_KEY);
 
-    user.token = token
-    await user.save()
+  user.token = token;
+  await user.save();
 
-    return token
-}
+  return token;
+};
 
 userSchema.statics.findByCredentials = async (email, password) => {
-    const user = await User.findOne({ email })
+  // eslint-disable-next-line no-use-before-define
+  const user = await User.findOne({ email });
 
-    if (!user) {
-        throw new Error('Unable to login')
-    }
+  if (!user) {
+    throw new Error('Unable to login');
+  }
 
-    const isMatch = await bcrypt.compare(password, user.password)
+  const isMatch = await bcrypt.compare(password, user.password);
 
-    if (!isMatch) {
-        throw new Error('Unable to login')
-    }
+  if (!isMatch) {
+    throw new Error('Unable to login');
+  }
 
-    return user
-}
+  return user;
+};
 
 // Hash the plain text password before saving
-userSchema.pre('save', async function (next) {
-    const user = this
+userSchema.pre('save', async (next) => {
+  const user = this;
 
-    if (user.isModified('password')) {
-        user.password = await bcrypt.hash(user.password, 8)
-    }
+  if (user.isModified('password')) {
+    user.password = await bcrypt.hash(user.password, 8);
+  }
 
-    next()
-})
+  next();
+});
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema);
 
 module.exports = {
-    User: User,
-    privateKey: JWT_PRIVATE_KEY
-}
+  User,
+  privateKey: JWT_PRIVATE_KEY,
+};
