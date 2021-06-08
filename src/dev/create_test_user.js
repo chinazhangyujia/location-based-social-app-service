@@ -1,14 +1,15 @@
 require('./prepare_db_connection');
 
+const bcrypt = require('bcryptjs');
 const { User } = require('../model/user');
 
-const sampleData = [
+const sampleData = (encodedPassword) => [
   {
     _id: '000000000000000000000000',
     name: 'Yujia',
     uniqueName: 'Yujia_0',
     email: 'test@gmail.com',
-    password: '12345677',
+    password: encodedPassword,
     birthday: '1993-01-01',
     introduction: 'I am a software engineer',
   },
@@ -17,7 +18,7 @@ const sampleData = [
     name: 'Gongxia',
     uniqueName: 'Gongxia_0',
     email: 'test1@gmail.com',
-    password: '12345677',
+    password: encodedPassword,
     birthday: '1990-01-01',
   },
   {
@@ -25,7 +26,7 @@ const sampleData = [
     name: 'Jake',
     uniqueName: 'Jake_0',
     email: 'test2@gmail.com',
-    password: '12345677',
+    password: encodedPassword,
     birthday: '1995-01-01',
   },
   {
@@ -33,12 +34,14 @@ const sampleData = [
     name: 'Rex',
     uniqueName: 'Rex_0',
     email: 'test3@gmail.com',
-    password: '12345677',
+    password: encodedPassword,
     birthday: '1960-01-01',
   },
 ];
 
 module.exports = async () => {
   await User.collection.drop();
-  await User.insertMany(sampleData);
+
+  const encodePassword = await bcrypt.hash('12345677', 8);
+  await User.insertMany(sampleData(encodePassword));
 };

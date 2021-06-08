@@ -26,7 +26,7 @@ const postSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-postSchema.methods.addLikesData = async (userId) => {
+postSchema.methods.addLikesData = async function addLikesData(userId) {
   const post = this;
   const postObject = post.toObject();
 

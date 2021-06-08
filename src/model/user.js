@@ -59,7 +59,7 @@ const userSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-userSchema.methods.toJSON = () => {
+userSchema.methods.toJSON = function toJSON() {
   const user = this;
   const userObject = user.toObject();
 
@@ -69,7 +69,7 @@ userSchema.methods.toJSON = () => {
   return userObject;
 };
 
-userSchema.methods.generateAuthToken = async () => {
+userSchema.methods.generateAuthToken = async function generateAuthToken() {
   const user = this;
   const token = jwt.sign({ _id: user._id.toString() }, JWT_PRIVATE_KEY);
 
@@ -97,7 +97,7 @@ userSchema.statics.findByCredentials = async (email, password) => {
 };
 
 // Hash the plain text password before saving
-userSchema.pre('save', async (next) => {
+userSchema.pre('save', async function preSave(next) {
   const user = this;
 
   if (user.isModified('password')) {
