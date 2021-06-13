@@ -195,6 +195,24 @@ const sampleData = [
     },
     owner: '000000000000000000000003',
   },
+  {
+    _id: '300000000000000000000003',
+    imageUrls: [
+      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
+      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+    ],
+    content: 'long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo'
+    + 'long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo'
+    + 'long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo',
+    location: {
+      coordinates: [
+        139.755963,
+        35.717237,
+      ],
+      type: 'Point',
+    },
+    owner: '000000000000000000000001',
+  },
 ];
 
 module.exports = async () => {
