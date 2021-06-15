@@ -1,4 +1,4 @@
-# Project Title
+# location-based-social-app-service
 
 Backend service of location base social app
 
