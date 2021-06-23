@@ -7,6 +7,7 @@ const Comment = require('../model/comment');
 const Post = require('../model/post');
 const CommentNotification = require('../model/comment_notification');
 
+// get comments for a post
 router.get('/comment/:postId', async (req, res) => {
   try {
     const { postId } = req.params;
@@ -23,6 +24,7 @@ router.get('/comment/:postId', async (req, res) => {
   }
 });
 
+// write comment for a post
 router.post('/comment', auth, async (req, res) => {
   const comment = new Comment({
     ...req.body,

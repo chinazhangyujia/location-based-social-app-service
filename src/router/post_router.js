@@ -161,6 +161,7 @@ router.get('/relevantPosts', auth, async (req, res) => {
   }
 });
 
+// get all posts from current user's friends
 router.get('/friendPosts', auth, async (req, res) => {
   try {
     const friends = await Friend.find({ user: req.user._id, status: 'active' }, 'friendUser').distinct('friendUser').exec();

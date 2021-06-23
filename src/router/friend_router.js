@@ -8,12 +8,10 @@ const Friend = require('../model/friend');
 const AddFriendRequest = require('../model/add_friend_request');
 
 /**
- * This class includes endpoints for both friendship and friend request
+ * This class includes endpoints for both friend relation and friend request
  */
 
-/**
-  * Friendship endpoints
-  */
+// get friends for current login user
 router.get('/friends', auth, async (req, res) => {
   try {
     const friends = await Friend.find({ user: req.user._id, status: 'active' })
@@ -30,6 +28,8 @@ router.get('/friends', auth, async (req, res) => {
   }
 });
 
+// get if the target user is a friend or not
+// or not friend but already sent out the friends request with current user
 router.get('/friendStatus', auth, async (req, res) => {
   try {
     const targetUser = req.query.user;
@@ -105,6 +105,7 @@ router.post('/addFriendRequest', auth, async (req, res) => {
   }
 });
 
+// called when user clicked the bell button to see new friend requests
 router.post('/markRequestAsNotified', auth, async (req, res) => {
   try {
     const { requestIds } = req.body;
@@ -133,6 +134,7 @@ router.get('/pendingRequests', auth, async (req, res) => {
   }
 });
 
+// accept or reject friend request
 router.post('/handleFriendRequest', auth, async (req, res) => {
   try {
     const { requestId } = req.body;

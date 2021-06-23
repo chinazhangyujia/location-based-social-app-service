@@ -8,6 +8,7 @@ const LikeNotification = require('../model/like_notification');
 
 const EARLIEST_NOTIFICATION_MONTH_BEFORE = 1;
 
+// get all the new comments related with logged in user that should notify the user
 router.get('/commentNotifications', auth, async (req, res) => {
   try {
     const commentNotification = await CommentNotification
@@ -25,6 +26,7 @@ router.get('/commentNotifications', auth, async (req, res) => {
   }
 });
 
+// get all the notifications that other people clicked like to relevant post
 router.get('/likeNotifications', auth, async (req, res) => {
   try {
     const likeNotifications = await LikeNotification

@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 const ChatMessage = require('../model/chat_message');
 const ChatThread = require('../model/chat_thread');
 
+// get all chat messages in one thread
 router.get('/chatMessage', auth, async (req, res) => {
   try {
     const threadId = req.query.thread;
@@ -35,6 +36,7 @@ router.get('/chatMessage', auth, async (req, res) => {
   }
 });
 
+// get summary information of one thread e.g last message, from user...
 router.get('/chatThreadSummaries', auth, async (req, res) => {
   try {
     const threads = await ChatThread.find({

@@ -112,6 +112,7 @@ router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
   }
 });
 
+// get current logged in user
 router.get('/user/me', auth, async (req, res) => {
   res.status(200).send(req.user);
 });

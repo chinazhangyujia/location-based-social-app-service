@@ -4,7 +4,6 @@ mongoose.connect(process.env.MONGODB_URI, {
   useNewUrlParser: true,
   useCreateIndex: true,
   autoIndex: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
 });
-
-mongoose.set('useFindAndModify', false);
-mongoose.set('useUnifiedTopology', true);
