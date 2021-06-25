@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 const Comment = require('../model/comment');
 const Post = require('../model/post');
 const CommentNotification = require('../model/comment_notification');
+const logger = require('../util/logger');
 
 // get comments for a post
 router.get('/comment/:postId', async (req, res) => {
@@ -19,7 +20,7 @@ router.get('/comment/:postId', async (req, res) => {
     res.status(200).send(comments);
   } catch (e) {
     const errorMessage = `Failed to get comments for request ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(400).send(errorMessage);
   }
 });
@@ -37,7 +38,7 @@ router.post('/comment', auth, async (req, res) => {
     // if successfully created comment, we want to create notification then
   } catch (e) {
     const errorMessage = `Failed to post comment for request ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(400).send(errorMessage);
     return;
   }
@@ -70,7 +71,7 @@ router.post('/comment', auth, async (req, res) => {
 
     CommentNotification.create(replyNotification);
   } catch (e) {
-    console.log(`Failed to create notification after inserted comment for request ${JSON.stringify(req.body)}`, e);
+    logger.error(`Failed to create notification after inserted comment for request ${JSON.stringify(req.body)}`, e);
   }
 });
 

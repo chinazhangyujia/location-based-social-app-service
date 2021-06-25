@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 const PostLikes = require('../model/post_likes');
 const Post = require('../model/post');
 const LikeNotification = require('../model/like_notification');
+const logger = require('../util/logger');
 
 /**
  * Like or dislike the post
@@ -35,11 +36,11 @@ router.post('/likePost', auth, async (req, res) => {
       LikeNotification.create(notification);
     } catch (e) {
       const errorMessage = `Failed to record like notification for req ${JSON.stringify(req.body)}`;
-      console.log(errorMessage, e);
+      logger.error(errorMessage, e);
     }
   } catch (e) {
     const errorMessage = `Failed to like or dislike post for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });

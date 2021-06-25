@@ -12,6 +12,7 @@ const postLikesRouter = require('./router/post_likes_router');
 const notificationRouter = require('./router/notification_router');
 const chatRouter = require('./router/chat_router');
 const chatWebsocket = require('./router/chat_websocket');
+const logger = require('./util/logger');
 
 const app = express();
 const server = http.createServer(app);
@@ -22,7 +23,7 @@ chatWebsocket(wss);
 const port = process.env.PORT;
 
 server.listen(port, () => {
-  console.log(`listening port ${port}`);
+  logger.info(`listening port ${port}`);
 });
 
 app.use(express.json());

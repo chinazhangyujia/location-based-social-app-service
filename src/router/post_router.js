@@ -8,6 +8,7 @@ const Comment = require('../model/comment');
 const CommentNotification = require('../model/comment_notification');
 const PostLikes = require('../model/post_likes');
 const auth = require('../middleware/auth');
+const logger = require('../util/logger');
 
 const METERS_PER_MILE = 1609.34;
 const DEFAULT_FETCH_SIZE = 5;
@@ -40,7 +41,7 @@ router.get('/post', auth, async (req, res) => {
     res.status(200).send(posts);
   } catch (e) {
     const errorMessage = `Failed to get posts for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -74,7 +75,7 @@ router.get('/allPosts', auth, async (req, res) => {
     res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get posts for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -185,7 +186,7 @@ router.get('/friendPosts', auth, async (req, res) => {
     res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get friends' posts for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -211,7 +212,7 @@ router.get('/myPosts', auth, async (req, res) => {
     res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get login user's posts for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -245,7 +246,7 @@ router.get('/likedPosts', auth, async (req, res) => {
     res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get liked posts for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -283,7 +284,7 @@ router.post('/post', auth, async (req, res) => {
     res.status(200).send(post);
   } catch (e) {
     const errorMessage = `Failed create a post for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });

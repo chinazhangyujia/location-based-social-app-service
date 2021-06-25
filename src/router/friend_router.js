@@ -6,6 +6,7 @@ const router = express.Router();
 const auth = require('../middleware/auth');
 const Friend = require('../model/friend');
 const AddFriendRequest = require('../model/add_friend_request');
+const logger = require('../util/logger');
 
 /**
  * This class includes endpoints for both friend relation and friend request
@@ -23,7 +24,7 @@ router.get('/friends', auth, async (req, res) => {
     res.status(200).send(friends);
   } catch (e) {
     const errorMessage = `Failed to fetch friends info for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(400).send(errorMessage);
   }
 });
@@ -34,7 +35,7 @@ router.get('/friendStatus', auth, async (req, res) => {
   try {
     const targetUser = req.query.user;
     if (!targetUser) {
-      console.log(`No target user Id passed in for req ${JSON.stringify(req.body)}`);
+      logger.error(`No target user Id passed in for req ${JSON.stringify(req.body)}`);
       res.status(400).send('No target user Id passed in');
       return;
     }
@@ -66,7 +67,7 @@ router.get('/friendStatus', auth, async (req, res) => {
     res.status(200).send(friendStatus);
   } catch (e) {
     const errorMessage = `Failed to get friend status for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -79,7 +80,7 @@ router.post('/cancelFriendship', auth, async (req, res) => {
     res.status(200).send({ friendUser: friendUserId });
   } catch (e) {
     const errorMessage = `Failed to delete friend for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -100,7 +101,7 @@ router.post('/addFriendRequest', auth, async (req, res) => {
     res.status(200).send();
   } catch (e) {
     const errorMessage = `Failed to record add friend request for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -114,7 +115,7 @@ router.post('/markRequestAsNotified', auth, async (req, res) => {
     res.status(200).send();
   } catch (e) {
     const errorMessage = `Failed to mark add friend request as notified for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -129,7 +130,7 @@ router.get('/pendingRequests', auth, async (req, res) => {
     res.status(200).send(pendingRequests);
   } catch (e) {
     const errorMessage = `Failed to get pending add friend request for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -147,7 +148,7 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
     if (friendRequest.toUser.toString() !== req.user._id.toString()) {
       await session.abortTransaction();
       session.endSession();
-      console.log(`Add friend request does not belong to this user, req: ${JSON.stringify(req.body)}`);
+      logger.error(`Add friend request does not belong to this user, req: ${JSON.stringify(req.body)}`);
       res.status(400).send('Add friend request does not belong to this user');
       return;
     }
@@ -163,7 +164,7 @@ router.post('/handleFriendRequest', auth, async (req, res) => {
     res.status(200).send();
   } catch (e) {
     const errorMessage = `Failed to handle friend request for req ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });

@@ -6,6 +6,7 @@ const auth = require('../middleware/auth');
 const router = express.Router();
 const Friend = require('../model/friend');
 const AddFriendRequest = require('../model/add_friend_request');
+const logger = require('../util/logger');
 
 router.post('/user/signup', async (req, res) => {
   try {
@@ -15,7 +16,7 @@ router.post('/user/signup', async (req, res) => {
     const exitingUniqueName = await User.find({ uniqueName }).exec();
 
     if (exitingUniqueName.length !== 0) {
-      console.log(`unique name ${exitingUniqueName} already exist`);
+      logger.error(`unique name ${exitingUniqueName} already exist`);
       res.status(400).send({ message: 'Please choose a different user name' });
       return;
     }
@@ -45,7 +46,7 @@ router.post('/user/login', async (req, res) => {
     res.status(200).send({ user, token });
   } catch (e) {
     const errorMessage = `User failed to login ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -58,7 +59,7 @@ router.post('/user/logout', auth, async (req, res) => {
     res.send();
   } catch (e) {
     const errorMessage = `User failed to logout ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });
@@ -70,7 +71,7 @@ router.get('/userById/:id', async (req, res) => {
     res.status(200).send(user);
   } catch (e) {
     const errorMessage = `Failed to find user info for userId ${req.params.id}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(400).send(errorMessage);
   }
 });
@@ -107,7 +108,7 @@ router.get('/userByUniqueName/:uniqueName', auth, async (req, res) => {
     res.status(200).send(userObject);
   } catch (e) {
     const errorMessage = `Failed to find user info for unique name ${req.params.uniqueName}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(400).send(errorMessage);
   }
 });
@@ -133,7 +134,7 @@ router.post('/user/updateUserInfo', auth, async (req, res) => {
     res.status(200).send(updatedInfo);
   } catch (e) {
     const errorMessage = `Failed to update user info ${JSON.stringify(req.body)}`;
-    console.log(errorMessage, e);
+    logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }
 });

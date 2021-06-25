@@ -6,6 +6,7 @@ const redis = require('redis');
 const { User, privateKey } = require('../model/user');
 const ChatThread = require('../model/chat_thread');
 const ChatMessage = require('../model/chat_message');
+const logger = require('../util/logger');
 
 const redisSubscriber = redis.createClient({
   host: process.env.REDIS_HOST,
@@ -69,7 +70,7 @@ const validateChatMessage = async (thread, sendTo, sendFrom, content) => {
 
   const threadObject = await ChatThread.findById(thread).exec();
   if (threadObject == null) {
-    console.log('thead not found');
+    logger.error('thead not found');
     return false;
   }
 
@@ -128,7 +129,7 @@ const broadcastMessage = (message, thread, wss) => {
 const chatWebsocket = (wss) => {
   redisSubscriber.on('message', (channel, message) => {
     if (!message) {
-      console.log('message is null');
+      logger.error('message is null');
       return;
     }
 
@@ -136,10 +137,10 @@ const chatWebsocket = (wss) => {
   });
 
   wss.on('connection', async (ws, req) => {
-    console.log('start websocket auth');
+    logger.info('start websocket auth');
 
     ws.on('close', () => {
-      console.log(`connection closed ${ws}`);
+      logger.info(`connection closed ${ws}`);
     });
 
     let thread;
@@ -167,12 +168,12 @@ const chatWebsocket = (wss) => {
         throw new Error('Failed to get or create chat thread');
       }
     } catch (e) {
-      console.log('websocket auth failed', e);
+      logger.error('websocket auth failed', e);
       ws.close();
       return;
     }
 
-    console.log('One user connected');
+    logger.info('One user connected');
 
     addToChatRoom(thread._id, ws);
 
@@ -182,14 +183,14 @@ const chatWebsocket = (wss) => {
     }));
 
     ws.on('message', async (message) => {
-      console.log('on message triggered');
+      logger.info('on message triggered');
       try {
         const messageObject = JSON.parse(message);
 
         const { event } = messageObject;
 
         if (!event) {
-          console.log('Event must be specified');
+          logger.error('Event must be specified');
           return;
         }
 
@@ -202,7 +203,7 @@ const chatWebsocket = (wss) => {
           // eslint-disable-next-line max-len
           const isMessageValid = await validateChatMessage(currentThread, sendTo, sendFrom, content);
           if (!isMessageValid) {
-            console.log('message data is not valid');
+            logger.error('message data is not valid');
             return;
           }
 
@@ -219,10 +220,10 @@ const chatWebsocket = (wss) => {
 
           leaveChatRoom(messageObject.thread, ws);
 
-          console.log('leave');
+          logger.info('leave');
         }
       } catch (e) {
-        console.log(e);
+        logger.error(`Failed to handle coming message ${message}`, e);
       }
     });
   });
