@@ -14,7 +14,7 @@ const addFriendRequestSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending', 'denied', 'accepted'],
+    enum: ['pending', 'rejected', 'accepted'],
     required: true,
   },
   notified: {
