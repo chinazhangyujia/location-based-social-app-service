@@ -18,6 +18,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000000',
+    topic: 'FOOD',
   },
   {
     _id: '000000000000000000000001',
@@ -34,6 +35,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000000',
+    topic: 'WORK',
   },
   {
     _id: '000000000000000000000002',
@@ -50,6 +52,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000001',
+    topic: 'STREET_VIEW',
   },
   {
     _id: '100000000000000000000000',
@@ -66,6 +69,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000003',
+    topic: 'ENTERTAINMENT',
   },
   {
     _id: '100000000000000000000001',
@@ -82,6 +86,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000003',
+    topic: 'FRIENDS',
   },
   {
     _id: '100000000000000000000002',
@@ -98,6 +103,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000001',
+    topic: 'WORK',
   },
   {
     _id: '200000000000000000000000',
@@ -114,6 +120,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000001',
+    topic: 'FOOD',
   },
   {
     _id: '200000000000000000000001',
@@ -130,6 +137,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000003',
+    topic: 'WORK',
   },
   {
     _id: '200000000000000000000002',
@@ -146,6 +154,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000000',
+    topic: 'STREET_VIEW',
   },
   {
     _id: '300000000000000000000000',
@@ -162,6 +171,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000002',
+    topic: 'WORK',
   },
   {
     _id: '300000000000000000000001',
@@ -178,6 +188,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000001',
+    topic: 'FOOD',
   },
   {
     _id: '300000000000000000000002',
@@ -194,6 +205,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000003',
+    topic: 'ENTERTAINMENT',
   },
   {
     _id: '300000000000000000000003',
@@ -212,6 +224,7 @@ const sampleData = [
       type: 'Point',
     },
     owner: '000000000000000000000001',
+    topic: 'WORK',
   },
 ];
 

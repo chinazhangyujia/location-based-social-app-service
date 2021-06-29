@@ -22,6 +22,11 @@ const postSchema = new mongoose.Schema({
     ref: 'User',
     index: true,
   },
+  topic: {
+    type: String,
+    enum: ['FOOD', 'WORK', 'STREET_VIEW', 'ENTERTAINMENT', 'SOCIAL', 'RELAXTION', 'FRIENDS', 'FAMILY'],
+    required: true,
+  },
 }, {
   timestamps: true,
 });
