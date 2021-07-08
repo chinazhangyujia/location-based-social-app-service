@@ -24,7 +24,7 @@ const postSchema = new mongoose.Schema({
   },
   topic: {
     type: String,
-    enum: ['FOOD', 'WORK', 'STREET_VIEW', 'ENTERTAINMENT', 'SOCIAL', 'RELAXTION', 'FRIENDS', 'FAMILY'],
+    enum: ['FOOD', 'WORK', 'STREET_VIEW', 'ENTERTAINMENT', 'SOCIAL', 'RELAXATION', 'FRIENDS', 'FAMILY'],
     required: true,
   },
 }, {
