@@ -10,7 +10,6 @@ const sampleData = (encodedPassword) => [
     uniqueName: 'Yujia_0',
     email: 'test@gmail.com',
     password: encodedPassword,
-    birthday: '1993-01-01',
     introduction: 'I am a software engineer',
   },
   {
@@ -19,7 +18,6 @@ const sampleData = (encodedPassword) => [
     uniqueName: 'Gongxia_0',
     email: 'test1@gmail.com',
     password: encodedPassword,
-    birthday: '1990-01-01',
   },
   {
     _id: '000000000000000000000002',
@@ -27,7 +25,6 @@ const sampleData = (encodedPassword) => [
     uniqueName: 'Jake_0',
     email: 'test2@gmail.com',
     password: encodedPassword,
-    birthday: '1995-01-01',
   },
   {
     _id: '000000000000000000000003',
@@ -35,7 +32,6 @@ const sampleData = (encodedPassword) => [
     uniqueName: 'Rex_0',
     email: 'test3@gmail.com',
     password: encodedPassword,
-    birthday: '1960-01-01',
   },
 ];
 

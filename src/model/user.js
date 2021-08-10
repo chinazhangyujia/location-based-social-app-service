@@ -41,10 +41,6 @@ const userSchema = new mongoose.Schema({
     minlength: 7,
     trim: true,
   },
-  birthday: {
-    type: String,
-    required: true,
-  },
   introduction: {
     type: String,
   },
