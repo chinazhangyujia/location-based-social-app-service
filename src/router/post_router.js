@@ -289,4 +289,20 @@ router.post('/post', auth, async (req, res) => {
   }
 });
 
+router.get('/postById/:postId', auth, async (req, res) => {
+  try {
+    const post = await Post
+      .find({ _id: req.params.postId })
+      .populate('owner')
+      .sort({ _id: -1 })
+      .exec();
+
+    res.status(200).send(await addLikesDataToPosts(post, req.user._id));
+  } catch (e) {
+    const errorMessage = `Failed to get post by id for req ${JSON.stringify(req.body)}`;
+    logger.error(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
+
 module.exports = router;
