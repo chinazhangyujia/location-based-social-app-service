@@ -13,16 +13,19 @@ const logger = require('../util/logger');
 const METERS_PER_MILE = 1609.34;
 const DEFAULT_FETCH_SIZE = 5;
 
-const addLikesDataToPosts = async (posts, userId) => {
-  const postsWithLikesData = [];
+/**
+ * Add meta data e.g likes count, comment count to post
+ */
+const addMetaDataToPosts = async (posts, userId) => {
+  const postsWithMetaData = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const post of posts) {
-    const postWithLikesData = post.addLikesData(userId);
-    postsWithLikesData.push(postWithLikesData);
+    const postWithMetaData = post.addMetaData(userId);
+    postsWithMetaData.push(postWithMetaData);
   }
 
   // eslint-disable-next-line no-return-await
-  return await Promise.all(postsWithLikesData);
+  return await Promise.all(postsWithMetaData);
 };
 
 /**
@@ -72,7 +75,7 @@ router.get('/allPosts', auth, async (req, res) => {
         .populate('owner')
         .exec();
 
-    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(posts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get posts for req ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
@@ -156,7 +159,7 @@ router.get('/relevantPosts', auth, async (req, res) => {
 
     posts = posts.slice(0, Math.min(limit, posts.length));
 
-    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(posts, req.user._id));
   } catch (e) {
     res.status(500).send("Failed to get friends' posts");
   }
@@ -183,7 +186,7 @@ router.get('/friendPosts', auth, async (req, res) => {
       .populate('owner')
       .exec();
 
-    res.status(200).send(await addLikesDataToPosts(friendPosts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(friendPosts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get friends' posts for req ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
@@ -209,7 +212,7 @@ router.get('/myPosts', auth, async (req, res) => {
       .populate('owner')
       .exec();
 
-    res.status(200).send(await addLikesDataToPosts(myPosts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(myPosts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get login user's posts for req ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
@@ -243,7 +246,7 @@ router.get('/likedPosts', auth, async (req, res) => {
       .sort({ _id: -1 })
       .exec();
 
-    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(posts, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get liked posts for req ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
@@ -267,7 +270,7 @@ router.get('/postWithUnnotifiedComment', auth, async (req, res) => {
       .sort({ _id: -1 })
       .exec();
 
-    res.status(200).send(await addLikesDataToPosts(posts, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(posts, req.user._id));
   } catch (e) {
     res.status(400).send('Failed to get posts with unnotified comment');
   }
