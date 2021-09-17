@@ -300,7 +300,7 @@ router.get('/postById/:postId', auth, async (req, res) => {
       .sort({ _id: -1 })
       .exec();
 
-    res.status(200).send(await addLikesDataToPosts(post, req.user._id));
+    res.status(200).send(await addMetaDataToPosts(post, req.user._id));
   } catch (e) {
     const errorMessage = `Failed to get post by id for req ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
