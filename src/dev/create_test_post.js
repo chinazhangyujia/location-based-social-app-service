@@ -6,8 +6,8 @@ const sampleData = [
   {
     _id: '000000000000000000000000',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
     ],
     content: 'post at apple headquarter 0',
     location: {
@@ -23,8 +23,8 @@ const sampleData = [
   {
     _id: '000000000000000000000001',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
     ],
     content: 'post at apple headquarter 1',
     location: {
@@ -40,8 +40,8 @@ const sampleData = [
   {
     _id: '000000000000000000000002',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
     ],
     content: 'post at apple headquarter 2',
     location: {
@@ -57,8 +57,8 @@ const sampleData = [
   {
     _id: '100000000000000000000000',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
     ],
     content: 'post at DC 0',
     location: {
@@ -74,8 +74,8 @@ const sampleData = [
   {
     _id: '100000000000000000000001',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
     ],
     content: 'post at DC 1',
     location: {
@@ -91,8 +91,8 @@ const sampleData = [
   {
     _id: '100000000000000000000002',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
     ],
     content: 'post at DC 2',
     location: {
@@ -108,8 +108,8 @@ const sampleData = [
   {
     _id: '200000000000000000000000',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
     ],
     content: 'post at Beijing 0',
     location: {
@@ -125,8 +125,8 @@ const sampleData = [
   {
     _id: '200000000000000000000001',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
     ],
     content: 'post at Beijing 1',
     location: {
@@ -142,8 +142,8 @@ const sampleData = [
   {
     _id: '200000000000000000000002',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
     ],
     content: 'post at Beijing 2',
     location: {
@@ -159,8 +159,8 @@ const sampleData = [
   {
     _id: '300000000000000000000000',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/63eda9ca-c8a8-4130-b22c-91bf428e4c99.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
     ],
     content: 'post at Tokyo 0',
     location: {
@@ -176,8 +176,8 @@ const sampleData = [
   {
     _id: '300000000000000000000001',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
     ],
     content: 'post at Tokyo 1',
     location: {
@@ -193,8 +193,8 @@ const sampleData = [
   {
     _id: '300000000000000000000002',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
     ],
     content: 'post at Tokyo 2',
     location: {
@@ -210,8 +210,8 @@ const sampleData = [
   {
     _id: '300000000000000000000003',
     imageUrls: [
-      'https://location-based-social-app.s3.amazonaws.com/post_image/c2ab08fb-646c-45d0-8ff7-10f4d63cf80d.jpg',
-      'https://location-based-social-app.s3.amazonaws.com/post_image/fe73b349-183a-4901-9b53-1177cbf2fb53.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/2e2e76af-742d-427a-b343-5ca43d613ddc.jpg',
+      'https://location-based-social-app-images.s3.amazonaws.com/post_image/8f552aab-dcb0-4341-9ee1-474acd63caa5.jpg',
     ],
     content: 'long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo'
     + 'long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo long post at Tokyo'
