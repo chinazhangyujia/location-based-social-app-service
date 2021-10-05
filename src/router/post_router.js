@@ -1,3 +1,4 @@
+/* eslint-disable arrow-body-style */
 /* eslint-disable no-underscore-dangle */
 const express = require('express');
 
@@ -9,6 +10,7 @@ const CommentNotification = require('../model/comment_notification');
 const PostLikes = require('../model/post_likes');
 const auth = require('../middleware/auth');
 const logger = require('../util/logger');
+const UserPostBlock = require('../model/user_post_block');
 
 const METERS_PER_MILE = 1609.34;
 const DEFAULT_FETCH_SIZE = 5;
@@ -26,6 +28,11 @@ const addMetaDataToPosts = async (posts, userId) => {
 
   // eslint-disable-next-line no-return-await
   return await Promise.all(postsWithMetaData);
+};
+
+const findBlockedUser = async (loginUserId) => {
+  const usersToBlock = await UserPostBlock.find({ fromUser: loginUserId }).exec();
+  return usersToBlock.map((utb) => utb.blockedUser);
 };
 
 /**
@@ -54,12 +61,15 @@ router.get('/allPosts', auth, async (req, res) => {
     const longitude = parseFloat(req.query.long);
     const latitude = parseFloat(req.query.lat);
 
+    const usersToBlock = await findBlockedUser(req.user._id);
     const query = req.query.fromId
       ? Post.find({
         _id: { $lt: req.query.fromId },
+        owner: { $nin: usersToBlock },
         location: { $nearSphere: { $geometry: { type: 'Point', coordinates: [longitude, latitude] }, $maxDistance: METERS_PER_MILE } },
       })
       : Post.find({
+        owner: { $nin: usersToBlock },
         location: { $nearSphere: { $geometry: { type: 'Point', coordinates: [longitude, latitude] }, $maxDistance: METERS_PER_MILE } },
       });
 

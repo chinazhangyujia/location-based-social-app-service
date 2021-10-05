@@ -7,6 +7,7 @@ const router = express.Router();
 const Friend = require('../model/friend');
 const AddFriendRequest = require('../model/add_friend_request');
 const logger = require('../util/logger');
+const UserPostBlock = require('../model/user_post_block');
 
 router.post('/user/signup', async (req, res) => {
   try {
@@ -134,6 +135,25 @@ router.post('/user/updateUserInfo', auth, async (req, res) => {
     res.status(200).send(updatedInfo);
   } catch (e) {
     const errorMessage = `Failed to update user info ${JSON.stringify(req.body)}`;
+    logger.error(errorMessage, e);
+    res.status(500).send(errorMessage);
+  }
+});
+
+router.post('/blockUserPosts', auth, async (req, res) => {
+  try {
+    const userToBlock = req.body.blockUser;
+    if (!userToBlock) {
+      return;
+    }
+
+    const block = new UserPostBlock({
+      fromUser: req.user._id,
+      blockedUser: userToBlock,
+    });
+    UserPostBlock.create(block);
+  } catch (e) {
+    const errorMessage = `Failed to block user ${JSON.stringify(req.body)}`;
     logger.error(errorMessage, e);
     res.status(500).send(errorMessage);
   }

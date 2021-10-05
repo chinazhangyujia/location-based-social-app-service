@@ -6,6 +6,7 @@ const createTestPost = require('./create_test_post');
 const createTestFriend = require('./create_test_friend');
 const createTestComment = require('./create_test_comment');
 const createTestNotification = require('./create_test_notification');
+const createTestBlockUser = require('./create_test_block_user');
 
 const prepareDevData = async () => {
   await createTestUser();
@@ -13,6 +14,7 @@ const prepareDevData = async () => {
   await createTestFriend();
   await createTestComment();
   await createTestNotification();
+  await createTestBlockUser();
 };
 
 prepareDevData().then(() => {
