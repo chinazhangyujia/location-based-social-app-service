@@ -1,6 +1,8 @@
 /* eslint-disable no-underscore-dangle */
 const mongoose = require('mongoose');
 const pointSchema = require('./point');
+const PostLikes = require('./post_likes');
+const Comment = require('./comment');
 
 const postSchema = new mongoose.Schema({
   content: {
@@ -26,17 +28,25 @@ const postSchema = new mongoose.Schema({
     enum: ['FOOD', 'WORK', 'STREET_VIEW', 'ENTERTAINMENT', 'SOCIAL', 'RELAXATION', 'FRIENDS', 'FAMILY'],
     required: true,
   },
-  commentCount: {
-    type: Number,
-    required: true,
-  },
-  likesCount: {
-    type: Number,
-    required: true,
-  },
 }, {
   timestamps: true,
 });
+
+postSchema.methods.addMetaData = async function addMetaData(userId) {
+  const post = this;
+  const postObject = post.toObject();
+
+  const postId = postObject._id;
+  const postLikes = await PostLikes.find({ post: postId, like: true }).exec();
+  const likesCount = postLikes.length;
+  const userLike = await PostLikes.findOne({ post: postId, fromUser: userId, like: true }).exec();
+  const commentCount = await Comment.countDocuments({ post: postId }).exec();
+
+  postObject.likesCount = likesCount;
+  postObject.userLiked = !!userLike;
+  postObject.commentCount = commentCount;
+  return postObject;
+};
 
 const Post = mongoose.model('Post', postSchema);
 

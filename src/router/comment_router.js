@@ -34,44 +34,45 @@ router.post('/comment', auth, async (req, res) => {
 
   try {
     await Comment.create(comment);
+    // eslint-disable-next-line max-len
+    const post = await Post.findByIdAndUpdate(req.body.post, { $inc: { commentCount: 1 } }).exec();
+
     res.status(200).send(comment);
     // if successfully created comment, we want to create notification then
-  } catch (e) {
-    const errorMessage = `Failed to post comment for request ${JSON.stringify(req.body)}`;
-    logger.error(errorMessage, e);
-    res.status(400).send(errorMessage);
-    return;
-  }
 
-  // record notification
-  try {
-    const post = await Post.findById(req.body.post).exec();
-    if (req.user._id.toString() === post.owner.toString()) {
-      return; // if it is a comment by the poster, don't send notification
-    }
+    // record notification
+    try {
+      if (req.user._id.toString() === post.owner.toString()) {
+        return; // if it is a comment by the poster, don't send notification
+      }
 
-    if (!req.body.sendTo) {
-      const commentNotification = new CommentNotification({
-        toUser: post.owner,
+      if (!req.body.sendTo) {
+        const commentNotification = new CommentNotification({
+          toUser: post.owner,
+          comment: comment._id,
+          post: post._id,
+          notified: false,
+        });
+
+        CommentNotification.create(commentNotification);
+        return;
+      }
+
+      const replyNotification = new CommentNotification({
+        toUser: req.body.sendTo,
         comment: comment._id,
         post: post._id,
         notified: false,
       });
 
-      CommentNotification.create(commentNotification);
-      return;
+      CommentNotification.create(replyNotification);
+    } catch (e) {
+      logger.error(`Failed to create notification after inserted comment for request ${JSON.stringify(req.body)}`, e);
     }
-
-    const replyNotification = new CommentNotification({
-      toUser: req.body.sendTo,
-      comment: comment._id,
-      post: post._id,
-      notified: false,
-    });
-
-    CommentNotification.create(replyNotification);
   } catch (e) {
-    logger.error(`Failed to create notification after inserted comment for request ${JSON.stringify(req.body)}`, e);
+    const errorMessage = `Failed to post comment for request ${JSON.stringify(req.body)}`;
+    logger.error(errorMessage, e);
+    res.status(400).send(errorMessage);
   }
 });
 

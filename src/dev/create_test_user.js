@@ -1,4 +1,4 @@
-require('./prepare_db_connection');
+require('./prepare_db_connection')('DEV');
 
 const bcrypt = require('bcryptjs');
 const { User } = require('../model/user');
