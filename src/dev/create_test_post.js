@@ -1,4 +1,4 @@
-require('./prepare_db_connection');
+require('./prepare_db_connection')('DEV');
 
 const Post = require('../model/post');
 
@@ -19,6 +19,8 @@ const sampleData = [
     },
     owner: '000000000000000000000000',
     topic: 'FOOD',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '000000000000000000000001',
@@ -36,6 +38,8 @@ const sampleData = [
     },
     owner: '000000000000000000000000',
     topic: 'WORK',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '000000000000000000000002',
@@ -53,6 +57,8 @@ const sampleData = [
     },
     owner: '000000000000000000000001',
     topic: 'STREET_VIEW',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '100000000000000000000000',
@@ -70,6 +76,8 @@ const sampleData = [
     },
     owner: '000000000000000000000003',
     topic: 'ENTERTAINMENT',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '100000000000000000000001',
@@ -87,6 +95,8 @@ const sampleData = [
     },
     owner: '000000000000000000000003',
     topic: 'FRIENDS',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '100000000000000000000002',
@@ -104,6 +114,8 @@ const sampleData = [
     },
     owner: '000000000000000000000001',
     topic: 'WORK',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '200000000000000000000000',
@@ -121,6 +133,8 @@ const sampleData = [
     },
     owner: '000000000000000000000001',
     topic: 'FOOD',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '200000000000000000000001',
@@ -138,6 +152,8 @@ const sampleData = [
     },
     owner: '000000000000000000000003',
     topic: 'WORK',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '200000000000000000000002',
@@ -155,6 +171,8 @@ const sampleData = [
     },
     owner: '000000000000000000000000',
     topic: 'STREET_VIEW',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '300000000000000000000000',
@@ -172,6 +190,8 @@ const sampleData = [
     },
     owner: '000000000000000000000002',
     topic: 'WORK',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '300000000000000000000001',
@@ -189,6 +209,8 @@ const sampleData = [
     },
     owner: '000000000000000000000001',
     topic: 'FOOD',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '300000000000000000000002',
@@ -206,6 +228,8 @@ const sampleData = [
     },
     owner: '000000000000000000000003',
     topic: 'ENTERTAINMENT',
+    commentCount: 0,
+    likesCount: 0,
   },
   {
     _id: '300000000000000000000003',
@@ -225,6 +249,8 @@ const sampleData = [
     },
     owner: '000000000000000000000001',
     topic: 'WORK',
+    commentCount: 0,
+    likesCount: 0,
   },
 ];
 

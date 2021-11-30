@@ -1,4 +1,4 @@
-require('./prepare_db_connection');
+require('./prepare_db_connection')('DEV');
 
 const Friend = require('../model/friend');
 

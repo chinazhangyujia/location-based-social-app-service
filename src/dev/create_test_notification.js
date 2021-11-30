@@ -1,4 +1,4 @@
-require('./prepare_db_connection');
+require('./prepare_db_connection')('DEV');
 
 const LikeNotification = require('../model/like_notification');
 const CommentNotification = require('../model/comment_notification');

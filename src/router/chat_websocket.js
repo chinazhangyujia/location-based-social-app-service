@@ -2,23 +2,10 @@
 const jwt = require('jsonwebtoken');
 const url = require('url');
 const WebSocket = require('ws');
-const redis = require('redis');
 const { User, privateKey } = require('../model/user');
 const ChatThread = require('../model/chat_thread');
 const ChatMessage = require('../model/chat_message');
 const logger = require('../util/logger');
-
-const redisSubscriber = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD,
-});
-
-const redisPublisher = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: process.env.REDIS_PORT,
-  password: process.env.REDIS_PASSWORD,
-});
 
 const chatRooms = {};
 
@@ -87,10 +74,8 @@ const addToChatRoom = (thread, ws) => {
   if (!room) {
     room = [ws];
     chatRooms[thread] = room;
-    redisSubscriber.subscribe(thread.toString());
   } else if (!room.includes(ws)) {
     room.push(ws);
-    redisSubscriber.subscribe(thread.toString());
   }
 };
 
@@ -109,7 +94,6 @@ const leaveChatRoom = (thread, ws) => {
 
   if (room.length === 0) {
     delete chatRooms[thread];
-    redisSubscriber.unsubscribe(thread);
   }
 };
 
@@ -127,15 +111,6 @@ const broadcastMessage = (message, thread, wss) => {
 };
 
 const chatWebsocket = (wss) => {
-  redisSubscriber.on('message', (channel, message) => {
-    if (!message) {
-      logger.error('message is null');
-      return;
-    }
-
-    broadcastMessage(message, channel, wss);
-  });
-
   wss.on('connection', async (ws, req) => {
     logger.info('start websocket auth');
 
@@ -210,9 +185,6 @@ const chatWebsocket = (wss) => {
           const storedMessage = await storeChatMessage(currentThread, sendTo, sendFrom, content);
           const storedMessageObject = storedMessage.toObject();
           storedMessageObject.type = 'message';
-
-          redisPublisher.publish(currentThread.toString(), JSON.stringify(storedMessageObject));
-          // broadcastMessage(JSON.stringify(storedMessageObject), thread, wss, ws);
         } else if (event === 'leave') {
           if (!messageObject.thread) {
             return;

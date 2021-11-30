@@ -1,3 +1,4 @@
+/* eslint-disable max-len */
 /* eslint-disable no-underscore-dangle */
 const express = require('express');
 
@@ -17,11 +18,12 @@ router.post('/likePost', auth, async (req, res) => {
       { fromUser: req.user._id, post: req.body.postId }, { like: req.body.like }, { upsert: true },
     ).exec();
 
+    const post = await Post.findByIdAndUpdate(req.body.postId, { $inc: { likesCount: req.body.like ? 1 : -1 } }).exec();
+
     res.status(200).send();
 
     // record notification
     try {
-      const post = await Post.findById(req.body.postId).exec();
       if (req.user._id.toString() === post.owner.toString()) {
         return;
       }

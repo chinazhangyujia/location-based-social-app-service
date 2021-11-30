@@ -1,4 +1,4 @@
-require('./prepare_db_connection');
+require('./prepare_db_connection')('DEV');
 
 const UserPostBlock = require('../model/user_post_block');
 

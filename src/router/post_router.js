@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+/* eslint-disable no-return-assign */
+/* eslint-disable max-len */
 /* eslint-disable arrow-body-style */
 /* eslint-disable no-underscore-dangle */
 const express = require('express');
@@ -19,15 +22,12 @@ const DEFAULT_FETCH_SIZE = 5;
  * Add meta data e.g likes count, comment count to post
  */
 const addMetaDataToPosts = async (posts, userId) => {
-  const postsWithMetaData = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const post of posts) {
-    const postWithMetaData = post.addMetaData(userId);
-    postsWithMetaData.push(postWithMetaData);
-  }
+  const postLikedByUser = await PostLikes.find({ post: { $in: posts.map((p) => p._id) }, fromUser: userId, like: true }, { post: 1 }).exec();
+  const postIdsLikedByUser = postLikedByUser.map((p) => p.post.toString());
 
-  // eslint-disable-next-line no-return-await
-  return await Promise.all(postsWithMetaData);
+  const postsWithMetaData = posts.map((p) => p.toObject());
+  postsWithMetaData.forEach((p) => p.userLiked = postIdsLikedByUser.includes(p._id.toString()));
+  return postsWithMetaData;
 };
 
 const findBlockedUser = async (loginUserId) => {
@@ -290,6 +290,8 @@ router.post('/post', auth, async (req, res) => {
   const post = new Post({
     ...req.body,
     owner: req.user._id,
+    commentCount: 0,
+    likesCount: 0,
   });
 
   try {
