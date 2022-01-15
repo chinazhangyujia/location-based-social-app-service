@@ -11,6 +11,12 @@ const postSchema = new mongoose.Schema({
     type: [String],
     required: true,
   },
+  mediaType: {
+    type: String,
+    enum: ['IMAGE', 'VIDEO'],
+    required: true,
+    default: 'IMAGE',
+  },
   location: {
     type: pointSchema,
     index: '2dsphere',

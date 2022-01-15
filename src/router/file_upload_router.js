@@ -21,7 +21,7 @@ const s3 = new AWS.S3({
  */
 router.post('/generatePresignedUrl', auth, (req, res) => {
   let { fileType } = req.body;
-  if (fileType !== '.jpg' && fileType !== '.png' && fileType !== '.jpeg') {
+  if (fileType !== '.jpg' && fileType !== '.png' && fileType !== '.jpeg' && fileType !== '.m4v') {
     return res.status(403)
       .send({ success: false, message: 'Image format invalid' });
   }
@@ -39,7 +39,7 @@ router.post('/generatePresignedUrl', auth, (req, res) => {
     Bucket: S3_BUCKET,
     Key: `${folder}/${fileName}.${fileType}`,
     Expires: 60 * 60,
-    ContentType: `image/${fileType}`,
+    ContentType: fileType === 'm4v' ? `video/${fileType}` : `image/${fileType}`,
     ACL: 'public-read',
   };
 
