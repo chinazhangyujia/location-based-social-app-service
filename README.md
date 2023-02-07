@@ -9,7 +9,7 @@ For development, you will need node and npm installed
 
 ## Install
 
-    $ git clone git@gitlab.com:gcyz/location-based-social-app-service.git
+    $ git clone git@github.com:chinazhangyujia/location-based-social-app-service.git
     $ cd location-based-social-app-service
     $ npm install
 
